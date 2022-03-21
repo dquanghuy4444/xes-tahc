@@ -46,20 +46,20 @@ mongoose.set('debug', true);
 
         ChatCalendarsModule,
 
-        CacheModule.registerAsync({
-            useFactory: () => ({
-                store: redisStore,
-                host: getEnv(ENUM_ENVIRONMENT_VARIABLE.REDIS_HOST),
-                port: getEnv(ENUM_ENVIRONMENT_VARIABLE.REDIS_PORT),
-                ttl: 60 * 3600 * 1000,
-            }),
-        }),
+        // CacheModule.registerAsync({
+        //     useFactory: () => ({
+        //         store: redisStore,
+        //         host: getEnv(ENUM_ENVIRONMENT_VARIABLE.REDIS_HOST),
+        //         port: getEnv(ENUM_ENVIRONMENT_VARIABLE.REDIS_PORT),
+        //         ttl: 60 * 3600 * 1000,
+        //     }),
+        // }),
     ],
     controllers: [],
     providers: [
         { provide: APP_PIPE, useValue: new ValidationPipe({ transform: true }) },
         { provide: APP_INTERCEPTOR, useClass: ResponseFormatterInterceptor },
-        { provide: APP_INTERCEPTOR, useClass: HttpCacheInterceptor },
+        // { provide: APP_INTERCEPTOR, useClass: HttpCacheInterceptor },
         { provide: APP_FILTER, useClass: ExceptionFormatter },
     ],
 })
