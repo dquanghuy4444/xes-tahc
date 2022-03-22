@@ -1,8 +1,13 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ChatRoomResponse, CreateRoomReq, UpdateRoomReq } from './dto/chat-rooms.dto';
+import {
+    ChatRoomDescriptionResponse,
+    ChatRoomDetailResponse,
+    CreateRoomReq,
+    UpdateRoomReq,
+} from './dto/chat-rooms.dto';
 import { User } from 'resources/users/entities/user.entity';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { ChatRoom } from './entities/chat-room.entity';
 import { Messenger } from 'resources/messengers/entities/messenger.entity';
 
@@ -20,10 +25,11 @@ export class ChatRoomsService {
             throw new BadRequestException('No User found');
         }
 
-        const { name, userIds, isGroup } = createRoomChatReq;
+        const { name, userIds, isGroup, avatar } = createRoomChatReq;
         const chatRoom = await this.chatRoomModel.create({
             name,
             isGroup,
+            avatar,
             userIds: [idFromToken, ...userIds],
             createAt: Date.now(),
         });
@@ -38,8 +44,39 @@ export class ChatRoomsService {
         }
         const messengers = await this.messengerModel.find({ chatRoomId: chatRoomId });
 
-        const temp: ChatRoomResponse = new ChatRoomResponse(room, messengers);
-        return temp;
+        return new ChatRoomDetailResponse(room, messengers);
+    }
+
+    async getMyChatRooms(idFromToken: string) {
+        const rooms = await this.chatRoomModel.find({ userIds: idFromToken }).exec(); // findById
+
+        const chatPrivateRooms = rooms.filter((item) => !item.isGroup);
+
+        const tempChatRoomDescriptionsResponse: ChatRoomDescriptionResponse[] = [];
+        await Promise.all(
+            chatPrivateRooms.map(async (room) => {
+                const userId = room.userIds.find((id) => id !== idFromToken);
+
+                const user = await this.userModel.findById(userId).exec(); // findById
+
+                const item = new ChatRoomDescriptionResponse(room);
+                item.name = user.fullName;
+                tempChatRoomDescriptionsResponse.push(item);
+            }),
+        );
+
+        const results = rooms.map((room) => {
+            const tempRoom = tempChatRoomDescriptionsResponse.find((crDes) =>
+                (room._id as Types.ObjectId).equals(crDes.id),
+            );
+            if (tempRoom) {
+                return tempRoom;
+            }
+
+            return new ChatRoomDescriptionResponse(room);
+        });
+
+        return results
     }
 
     async update(chatRoomId: string, updateRoomChatReq: UpdateRoomReq, idFromToken: string) {

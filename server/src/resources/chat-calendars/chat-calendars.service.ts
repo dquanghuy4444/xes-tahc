@@ -14,32 +14,27 @@ export class ChatCalendarsService {
         private readonly chatRoomsService: ChatRoomsService,
     ) {}
 
-    async create(
-        createChatCalendarReq: CreateChatCalendarReq,
-        idFromToken: string
-    ) {
-        const { recipentId, content , type , time } = createChatCalendarReq;
+    async create(createChatCalendarReq: CreateChatCalendarReq, idFromToken: string) {
+        // const { recipentId, content, type, time } = createChatCalendarReq;
 
-        let chatRoom = await this.chatRoomModel.findOne({ userIds: [idFromToken, recipentId] }).exec();
-        if (!chatRoom) {
-            chatRoom = await this.chatRoomsService.create(
-                {
-                    name: 'room chat',
-                    userIds: [recipentId],
-                    isGroup: true,
-                },
-                idFromToken,
-            );
-        }
+        // let chatRoom = await this.chatRoomModel.findOne({ userIds: [idFromToken, recipentId] }).exec();
+        // if (!chatRoom) {
+        //     chatRoom = await this.chatRoomsService.create(
+        //         {
+        //             userIds: [recipentId],
+        //         },
+        //         idFromToken,
+        //     );
+        // }
 
-        await this.messengerModel.create({
-            content,
-            type,
-            time,
-            senderId:idFromToken,
-            chatRoomId: chatRoom.id,
-            createAt: Date.now(),
-        })
+        // await this.messengerModel.create({
+        //     content,
+        //     type,
+        //     time,
+        //     senderId: idFromToken,
+        //     chatRoomId: chatRoom.id,
+        //     createAt: Date.now(),
+        // });
 
         return 'This action adds a new chatCalendar';
     }

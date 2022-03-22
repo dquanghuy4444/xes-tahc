@@ -15,6 +15,12 @@ const routes = [
         element   : React.lazy(() => import("./pages/Dashboard"))
     },
     {
+        path      : "/room/:id",
+        hasAuth   : true,
+        hasLayout : true,
+        element   : React.lazy(() => import("./pages/ChatRoom"))
+    },
+    {
         path      : "/login",
         hasAuth   : false,
         hasLayout : false,

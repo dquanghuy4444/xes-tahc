@@ -14,7 +14,8 @@ export class UsersService {
             throw new BadRequestException('No User found');
         }
         return {
-            username: user.fullName,
+            fullName: user.fullName,
+            username: user.username,
         };
     }
 
