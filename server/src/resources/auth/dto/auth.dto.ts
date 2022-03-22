@@ -5,6 +5,9 @@ export class RegisterRequest {
     username: string;
 
     @IsNotEmpty()
+    fullName: string;
+
+    @IsNotEmpty()
     phoneNumber: string;
 
     @IsNotEmpty()

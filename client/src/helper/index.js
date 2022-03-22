@@ -1,16 +1,19 @@
 /* eslint-disable default-param-last */
-
 import { axios } from "./config"
+
+const handleTransformResponse = (response) => {
+    if (response?.success){
+        return response.payload
+    }
+
+    return false
+}
 
 const fetchData = async(path, payload) => {
     try {
         const response = await axios.get(`${path}`, payload)
 
-        if (response?.success){
-            return response.payload
-        }
-
-        return false
+        return handleTransformResponse(response)
     } catch (ex){
         return {
             error: ex
@@ -23,11 +26,8 @@ const putData = async(path, idItem, data) => {
         const response = await axios.put(`${path}/${idItem}`, {
             data
         })
-        if (response?.success){
-            return response.payload
-        }
 
-        return false
+        return handleTransformResponse(response)
     } catch (ex){
         return {
             error: ex
@@ -41,11 +41,8 @@ const postData = async(path, data) => {
             ...data
         }
         const response = await axios.post(path, temp)
-        if (response?.success){
-            return response.payload
-        }
 
-        return false
+        return handleTransformResponse(response)
     } catch (ex){
         return {
             error: ex

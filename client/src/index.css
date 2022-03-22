@@ -10,7 +10,6 @@ body {
         "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    background-color: #dae3f7;
 }
 
 code {
@@ -21,4 +20,13 @@ code {
     display: flex;
     align-items: center;
     justify-content: center;
+}
+
+.text-overflow {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow: hidden;
+
+    word-break: break-all;
+    word-wrap: break-word;
 }
