@@ -18,6 +18,11 @@ export class ChatRoomsController {
         return this.chatRoomsService.getDetail(chatRoomId, idFromToken);
     }
 
+    @Get('/me')
+    getMyChatRooms(@IdFromToken() idFromToken: string) {
+        return this.chatRoomsService.getMyChatRooms(idFromToken);
+    }
+
     @Put(':id')
     update(@IdFromToken() idFromToken: string, @Param('id') chatRoomId: string, @Body() updateRoomReq: UpdateRoomReq) {
         return this.chatRoomsService.update(chatRoomId,updateRoomReq, idFromToken);

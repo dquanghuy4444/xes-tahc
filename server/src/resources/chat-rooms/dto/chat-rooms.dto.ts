@@ -1,13 +1,16 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Messenger } from 'resources/messengers/entities/messenger.entity';
+import { ChatRoom } from '../entities/chat-room.entity';
 
 export class CreateRoomReq {
-    @IsNotEmpty()
-    name: string;
+    @IsOptional()
+    name = 'Chat riêng';
 
     @IsOptional()
-    @IsNotEmpty()
     isGroup = false;
+
+    @IsOptional()
+    avatar = 'https://thao68.com/wp-content/uploads/2022/02/avatar-hero-team-15.jpg';
 
     @IsNotEmpty()
     userIds: string[];
@@ -18,25 +21,30 @@ export class UpdateRoomReq {
     userIds: string[];
 }
 
-class ChatRoom {
+
+export class ChatRoomDescriptionResponse {
+    id: string;
     name: string;
     userIds: string[];
     isGroup: boolean;
     createdAt: Date;
+    avatar: string;
 
-    constructor(name: string, userIds: string[], isGroup: boolean, createdAt: Date) {
-        this.name = name;
-        this.userIds = userIds;
-        this.isGroup = isGroup;
-        this.createdAt = createdAt;
+    constructor(chatRoom: ChatRoom) {
+        this.id = chatRoom.id;
+        this.name = chatRoom.name;
+        this.userIds = chatRoom.userIds;
+        this.avatar = chatRoom.avatar;
+        this.isGroup = chatRoom.isGroup;
+        this.createdAt = chatRoom.createdAt;
     }
 }
 
-export class ChatRoomResponse extends ChatRoom {
+export class ChatRoomDetailResponse extends ChatRoomDescriptionResponse {
     messengers: Messenger[];
 
     constructor(chatRoom: ChatRoom, messengers: Messenger[]) {
-        super(chatRoom.name, chatRoom.userIds, chatRoom.isGroup, chatRoom.createdAt);
+        super(chatRoom);
         this.messengers = messengers;
     }
 }

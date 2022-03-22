@@ -9,6 +9,8 @@ export class ChatRoom extends Document {
     userIds: string[];
     @Prop()
     isGroup: boolean;
+    @Prop()
+    avatar: string;
     @Prop({ type: Date, default: Date.now })
     createdAt: Date;
 }
