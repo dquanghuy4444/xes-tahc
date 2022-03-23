@@ -18,25 +18,29 @@ export class CreateRoomReq {
 
 export class UpdateRoomReq {
     name: string;
-    userIds: string[];
+    avatar: string;
 }
 
+interface ILastMessage{
+    content: string;
+    nameUser: string;
+    createdAt: string;
+    hasRead: boolean;
+}
 
 export class ChatRoomDescriptionResponse {
     id: string;
     name: string;
-    userIds: string[];
     isGroup: boolean;
-    createdAt: Date;
     avatar: string;
+    lastMessage: ILastMessage;
 
-    constructor(chatRoom: ChatRoom) {
+    constructor(chatRoom: ChatRoom, lastMessage: ILastMessage) {
         this.id = chatRoom.id;
         this.name = chatRoom.name;
-        this.userIds = chatRoom.userIds;
         this.avatar = chatRoom.avatar;
         this.isGroup = chatRoom.isGroup;
-        this.createdAt = chatRoom.createdAt;
+        this.lastMessage = lastMessage;
     }
 }
 

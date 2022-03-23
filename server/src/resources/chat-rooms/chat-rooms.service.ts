@@ -10,10 +10,13 @@ import { User } from 'resources/users/entities/user.entity';
 import { Model, Types } from 'mongoose';
 import { ChatRoom } from './entities/chat-room.entity';
 import { Messenger } from 'resources/messengers/entities/messenger.entity';
+import { ChatParticipalsService } from 'resources/chat-participals/chat-participals.service';
+import { IUserInformation } from 'resources/chat-participals/entities/chat-participal.entity';
 
 @Injectable()
 export class ChatRoomsService {
     constructor(
+        private readonly chatParticipalsService: ChatParticipalsService,
         @InjectModel(User.name) private userModel: Model<User>,
         @InjectModel(ChatRoom.name) private chatRoomModel: Model<ChatRoom>,
         @InjectModel(Messenger.name) private messengerModel: Model<Messenger>,
@@ -30,8 +33,17 @@ export class ChatRoomsService {
             name,
             isGroup,
             avatar,
-            userIds: [idFromToken, ...userIds],
             createAt: Date.now(),
+            createdBy: idFromToken,
+        });
+
+        const userInformations: IUserInformation[] = [idFromToken, ...userIds].map((userId) => ({
+            userId,
+            lastTimeReading: Date.now(),
+        }));
+        await this.chatParticipalsService.create({
+            chatRoomId: chatRoom.id,
+            userInformations,
         });
         return chatRoom;
     }
@@ -39,7 +51,9 @@ export class ChatRoomsService {
     async getDetail(chatRoomId: string, idFromToken: string) {
         const room = await this.chatRoomModel.findOne({ _id: chatRoomId }).exec(); // findById
 
-        if (!room || !room.userIds.some((id) => id === idFromToken)) {
+        const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id);
+
+        if (!room || !chatParticipal.userInformations.some((infor) => infor.userId === idFromToken)) {
             throw new BadRequestException('Wrong chat! Please try again');
         }
         const messengers = await this.messengerModel.find({ chatRoomId: chatRoomId });
@@ -53,13 +67,17 @@ export class ChatRoomsService {
         const chatPrivateRooms = rooms.filter((item) => !item.isGroup);
 
         const tempChatRoomDescriptionsResponse: ChatRoomDescriptionResponse[] = [];
+
+        const lastMessage = null;
         await Promise.all(
             chatPrivateRooms.map(async (room) => {
-                const userId = room.userIds.find((id) => id !== idFromToken);
+                const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id);
+
+                const userId = chatParticipal.userInformations.find((infor) => infor.userId !== idFromToken);
 
                 const user = await this.userModel.findById(userId).exec(); // findById
 
-                const item = new ChatRoomDescriptionResponse(room);
+                const item = new ChatRoomDescriptionResponse(room, lastMessage);
                 item.name = user.fullName;
                 tempChatRoomDescriptionsResponse.push(item);
             }),
@@ -73,24 +91,25 @@ export class ChatRoomsService {
                 return tempRoom;
             }
 
-            return new ChatRoomDescriptionResponse(room);
+            return new ChatRoomDescriptionResponse(room, lastMessage);
         });
 
-        return results
+        return results;
     }
 
     async update(chatRoomId: string, updateRoomChatReq: UpdateRoomReq, idFromToken: string) {
         const room = await this.chatRoomModel.findOne({ _id: chatRoomId }).exec();
+        const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id);
 
-        if (!room || !room.userIds.some((id) => id === idFromToken)) {
+        if (!room || !chatParticipal.userInformations.some((infor) => infor.userId === idFromToken)) {
             throw new BadRequestException('Wrong chat! Please try again');
         }
 
-        const { name, userIds } = updateRoomChatReq;
+        const { name, avatar } = updateRoomChatReq;
 
         await room.updateOne({
             name: name || room.name,
-            userIds: userIds || room.userIds,
+            avatar: avatar || room.avatar,
         });
 
         return room;

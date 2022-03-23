@@ -20,6 +20,7 @@ import { ChatScheduleModule } from 'events/chat-schedule/chat-schedule.module';
 
 import redisStore from 'cache-manager-ioredis';
 import { HttpCacheInterceptor } from 'interceptors/http-cache.interceptor';
+import { ChatParticipalsModule } from './resources/chat-participals/chat-participals.module';
 
 mongoose.set('debug', true);
 
@@ -45,6 +46,8 @@ mongoose.set('debug', true);
         // ChatScheduleModule,
 
         ChatCalendarsModule,
+
+        ChatParticipalsModule,
 
         // CacheModule.registerAsync({
         //     useFactory: () => ({
