@@ -8,23 +8,32 @@ import FormControl from "@mui/material/FormControl"
 import InputAdornment from "@mui/material/InputAdornment"
 import InputLabel from "@mui/material/InputLabel"
 import OutlinedInput from "@mui/material/OutlinedInput"
-import { fetchData } from "helper"
+import useFetchData from "hooks/useFetchData"
 
 import ChatRoomCard from "./ChatRoomCard"
 
 const Sidebar = () => {
     const [search, setSearch] = useState("")
-    const [myChatRoom, setMyChatRoom] = useState([])
 
-    useEffect(() => {
-        const getMaChatRooms = async() => {
-            const res = await fetchData("chat-rooms/me")
+    const cb = (res) => {
+        const temp = res.sort((a, b) => {
+            if (!a.lastMessageInfor){
+                return 1
+            }
 
-            setMyChatRoom(res)
-        }
+            if (b.lastMessageInfor){
+                return Date(a.lastMessageInfor.createAt).localeCompare(
+                    Date(b.lastMessageInfor.createAt)
+                )
+            }
 
-        getMaChatRooms()
-    }, [])
+            return -1
+        })
+
+        return temp
+    }
+
+    const data = useFetchData("chat-rooms/me", cb)
 
     return (
         <section className="min-w-[360px] h-full border-border border-r-2 flex flex-col">
@@ -57,20 +66,18 @@ const Sidebar = () => {
                 </FormControl>
             </div>
 
-            <div className="overflow-auto pl-4 pr-2 pb-2">
-                {
-                    myChatRoom.length > 0 ? (
-                        myChatRoom.map((item) => (
-                            <React.Fragment key={ item._id }>
-                                <ChatRoomCard info={ item } />
-                            </React.Fragment>
-                        ))
-                    ) : (
-                        <p className="text-center mt-4 font-semibold text-lg">
-                            Bạn chưa có cuộc hội thoại nào
-                        </p>
-                    )
-                }
+            <div className="overflow-auto px-4 pb-2">
+                { data?.length > 0 ? (
+                    data.map((item) => (
+                        <React.Fragment key={ item.id }>
+                            <ChatRoomCard info={ item } />
+                        </React.Fragment>
+                    ))
+                ) : (
+                    <p className="text-center mt-4 font-semibold text-lg">
+                        Bạn chưa có cuộc hội thoại nào
+                    </p>
+                ) }
             </div>
         </section>
     )
