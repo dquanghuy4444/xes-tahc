@@ -16,7 +16,6 @@ export class MessengersService {
 
     async create(createMessengerReq: CreateMessengerReq, idFromToken: string) {
         const { chatRoomId, type } = createMessengerReq;
-        console.log(createMessengerReq);
         const chatRoom = await this.chatRoomModel.findById(chatRoomId).exec(); // findById
         if (!chatRoom) {
             throw new BadRequestException('Wrong chat! Please try again');
@@ -37,7 +36,6 @@ export class MessengersService {
         await this.messengerModel.create({
             ...doc,
             senderId: idFromToken,
-            createAt: Date.now(),
         });
         return '';
     }

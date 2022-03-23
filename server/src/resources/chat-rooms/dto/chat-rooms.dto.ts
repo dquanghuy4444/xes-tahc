@@ -21,10 +21,10 @@ export class UpdateRoomReq {
     avatar: string;
 }
 
-interface ILastMessage{
+interface IlastMessageInfor{
     content: string;
     nameUser: string;
-    createdAt: string;
+    createdAt: Date;
     hasRead: boolean;
 }
 
@@ -33,14 +33,14 @@ export class ChatRoomDescriptionResponse {
     name: string;
     isGroup: boolean;
     avatar: string;
-    lastMessage: ILastMessage;
+    lastMessageInfor: IlastMessageInfor;
 
-    constructor(chatRoom: ChatRoom, lastMessage: ILastMessage) {
+    constructor(chatRoom: ChatRoom) {
         this.id = chatRoom.id;
         this.name = chatRoom.name;
         this.avatar = chatRoom.avatar;
         this.isGroup = chatRoom.isGroup;
-        this.lastMessage = lastMessage;
+        this.lastMessageInfor = null;
     }
 }
 

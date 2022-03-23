@@ -33,7 +33,6 @@ export class ChatRoomsService {
             name,
             isGroup,
             avatar,
-            createAt: Date.now(),
             createdBy: idFromToken,
         });
 
@@ -64,37 +63,48 @@ export class ChatRoomsService {
     async getMyChatRooms(idFromToken: string) {
         const rooms = await this.chatRoomModel.find({ userIds: idFromToken }).exec(); // findById
 
-        const chatPrivateRooms = rooms.filter((item) => !item.isGroup);
+        const result: ChatRoomDescriptionResponse[] = [];
 
-        const tempChatRoomDescriptionsResponse: ChatRoomDescriptionResponse[] = [];
-
-        const lastMessage = null;
         await Promise.all(
-            chatPrivateRooms.map(async (room) => {
+            rooms.map(async (room) => {
+                const item = new ChatRoomDescriptionResponse(room);
                 const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id);
 
-                const userId = chatParticipal.userInformations.find((infor) => infor.userId !== idFromToken);
+                if (!room.isGroup) {
+                    const userInfor = chatParticipal.userInformations.find((infor) => infor.userId !== idFromToken);
+                    const user = await this.userModel.findById(userInfor.userId).exec(); // findById
 
-                const user = await this.userModel.findById(userId).exec(); // findById
+                    item.name = user.fullName;
+                }
 
-                const item = new ChatRoomDescriptionResponse(room, lastMessage);
-                item.name = user.fullName;
-                tempChatRoomDescriptionsResponse.push(item);
+                const myInfor = chatParticipal.userInformations.find((infor) => infor.userId === idFromToken);
+                const { lastTimeReading } = myInfor;
+
+                const lastMessage = await this.messengerModel
+                    .findOne({ chatRoomId: room.id })
+                    .sort({ createdAt: -1 })
+                    .exec();
+
+                if (lastMessage) {
+                    let nameUser = 'Bạn';
+
+                    if (room.isGroup && lastMessage.senderId !== idFromToken) {
+                        const user = await this.userModel.findById(lastMessage.senderId).exec(); // findById
+                        nameUser = user.fullName;
+                    }
+                    item.lastMessageInfor = {
+                        createdAt: lastMessage.createdAt,
+                        content: lastMessage.content,
+                        nameUser,
+                        hasRead: new Date(lastMessage.createdAt).getTime() <= new Date(lastTimeReading).getTime(),
+                    };
+                }
+
+                result.push(item);
             }),
         );
 
-        const results = rooms.map((room) => {
-            const tempRoom = tempChatRoomDescriptionsResponse.find((crDes) =>
-                (room._id as Types.ObjectId).equals(crDes.id),
-            );
-            if (tempRoom) {
-                return tempRoom;
-            }
-
-            return new ChatRoomDescriptionResponse(room, lastMessage);
-        });
-
-        return results;
+        return result;
     }
 
     async update(chatRoomId: string, updateRoomChatReq: UpdateRoomReq, idFromToken: string) {
