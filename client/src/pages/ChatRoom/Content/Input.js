@@ -31,7 +31,7 @@ const Input = ({ id }) => {
 
     return (
         <div className="min-h-[60px] flex items-center space-x-3 px-4">
-            <InsertPhotoIcon color="primary" />
+            <InsertPhotoIcon color="primary" sx={ { cursor: "pointer" } } />
 
             <TextField
                 fullWidth

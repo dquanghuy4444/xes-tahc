@@ -4,8 +4,9 @@ import ReactDOM from "react-dom"
 
 import App from "./App"
 
-import "./index.css"
-import "./variables.css"
+import "./styles/index.css"
+import "./styles/variables.css"
+import "react-toastify/dist/ReactToastify.css"
 
 ReactDOM.render(
     <React.StrictMode>

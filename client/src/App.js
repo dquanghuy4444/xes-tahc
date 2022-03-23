@@ -4,8 +4,7 @@ import { fetchData } from "helper"
 import Layout from "layout"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
-
-import "react-toastify/dist/ReactToastify.css"
+import { useStore } from 'store'
 
 const routes = [
     {
@@ -46,6 +45,8 @@ const withAuthor = (Component, isAuthenticated) => {
 }
 
 const App = () => {
+    const setMyInfor = useStore((state) => state.setMyInfor)
+
     const [isAuthenticated, setIsAuthenticated] = useState(true)
 
     useEffect(() => {
@@ -55,6 +56,8 @@ const App = () => {
             if (!res){
                 setIsAuthenticated(false)
             }
+
+            setMyInfor(res)
         }
 
         getAuthen()

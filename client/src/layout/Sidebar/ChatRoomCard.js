@@ -16,7 +16,8 @@ const ChatRoomCard = ({ info }) => {
         }
 
         const { createdAt } = lastMessageInfor
-        const str = moment(createdAt).fromNow()
+        let str = moment(createdAt).fromNow()
+        str = str.replace("minutes ago", "phút")
 
         return <p className="text-xs text-quinary">{ str }</p>
     }

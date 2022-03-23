@@ -10,14 +10,13 @@ import "./index.css"
 const ChatRoom = () => {
     const { id } = useParams()
 
-    const data = useFetchData(`/chat-rooms/${id}` , null , [id])
-
+    const data = useFetchData(`/chat-rooms/${id}`, null, [id])
 
     return (
         <div className="h-full chat">
             <Header avatar={ data?.avatar } id={ id } name={ data?.name } />
 
-            <Content id={ id } mess={ data?.messengers } />
+            <Content id={ id } messengers={ data?.messengers } userInfors={ data?.userInfors } />
         </div>
     )
 }
