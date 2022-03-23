@@ -60,16 +60,12 @@ export class AuthService {
 
     async login(loginReq: LoginRequest): Promise<string> {
         const { username, password } = loginReq;
-        let user = await this.userModel.findOne({ username }).exec();
+        const user = await this.userModel.findOne({ username }).exec();
         if (!user) {
             throw new BadRequestException('No User found');
         }
         const passwordValid = await compare(password, user.password);
 
-        user = await this.userModel.create({
-            username,
-            password: await hash(password, 10),
-        });
         if (!passwordValid) {
             throw new BadRequestException('Invalid password');
         }

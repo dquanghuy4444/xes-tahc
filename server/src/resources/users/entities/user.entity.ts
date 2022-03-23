@@ -2,7 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 @Schema()
 export class User extends Document {
-    @Prop()
+    @Prop({ type: String, default: 'https://thao68.com/wp-content/uploads/2022/02/avatar-hero-team-15.jpg' })
     avatar: string;
     @Prop()
     username: string;
