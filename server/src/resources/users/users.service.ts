@@ -2,29 +2,32 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './entities/user.entity';
 import { Model } from 'mongoose';
-import { UpdateUserReq } from './dto/user.dto';
+import { UserInfor } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
     constructor(@InjectModel(User.name) private userModel: Model<User>) {}
 
-    async getDetail(idFromToken: string) {
-        const user = await this.userModel.findOne({ _id: idFromToken }).exec(); // findById
+    async getDetail(id: string): Promise<UserInfor> {
+        const user = await this.userModel.findById(id).exec(); // findById
         if (!user) {
             throw new BadRequestException('No User found');
         }
         return {
+            id: user.id,
             fullName: user.fullName,
-            username: user.username,
+            avatar: user.avatar,
+            phoneNumber: user.phoneNumber,
+            email: user.email,
         };
     }
 
-    async update(idFromToken: string, updateUserReq: UpdateUserReq) {
+    async update(updateUserReq: UserInfor, idFromToken: string) {
         const user = await this.userModel
             .findByIdAndUpdate(
                 idFromToken,
                 {
-                    name: updateUserReq.name,
+                    fullName: updateUserReq.fullName,
                     phoneNumber: updateUserReq.phoneNumber,
                 },
                 { new: true },
@@ -33,6 +36,6 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException();
         }
-        return ;
+        return;
     }
 }

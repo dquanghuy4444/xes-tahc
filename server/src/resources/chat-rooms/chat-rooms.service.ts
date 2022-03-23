@@ -6,27 +6,24 @@ import {
     CreateRoomReq,
     UpdateRoomReq,
 } from './dto/chat-rooms.dto';
-import { User } from 'resources/users/entities/user.entity';
 import { Model, Types } from 'mongoose';
 import { ChatRoom } from './entities/chat-room.entity';
 import { Messenger } from 'resources/messengers/entities/messenger.entity';
 import { ChatParticipalsService } from 'resources/chat-participals/chat-participals.service';
 import { IUserInformation } from 'resources/chat-participals/entities/chat-participal.entity';
+import { UsersService } from 'resources/users/users.service';
 
 @Injectable()
 export class ChatRoomsService {
     constructor(
         private readonly chatParticipalsService: ChatParticipalsService,
-        @InjectModel(User.name) private userModel: Model<User>,
+        private readonly usersService: UsersService,
         @InjectModel(ChatRoom.name) private chatRoomModel: Model<ChatRoom>,
         @InjectModel(Messenger.name) private messengerModel: Model<Messenger>,
     ) {}
 
     async create(createRoomChatReq: CreateRoomReq, idFromToken: string) {
-        const user = await this.userModel.findOne({ _id: idFromToken }).exec(); // findById
-        if (!user) {
-            throw new BadRequestException('No User found');
-        }
+        await this.usersService.getDetail(idFromToken);
 
         const { name, userIds, isGroup, avatar } = createRoomChatReq;
         const chatRoom = await this.chatRoomModel.create({
@@ -55,9 +52,19 @@ export class ChatRoomsService {
         if (!room || !chatParticipal.userInformations.some((infor) => infor.userId === idFromToken)) {
             throw new BadRequestException('Wrong chat! Please try again');
         }
+
+        const userInfors = [];
+        await Promise.all(
+            chatParticipal.userInformations.map(async (infor) => {
+                if (infor.userId !== idFromToken) {
+                    const userInfor = await this.usersService.getDetail(infor.userId);
+                    userInfors.push(userInfor);
+                }
+            }),
+        );
         const messengers = await this.messengerModel.find({ chatRoomId: chatRoomId });
 
-        return new ChatRoomDetailResponse(room, messengers);
+        return new ChatRoomDetailResponse(room, userInfors, messengers);
     }
 
     async getMyChatRooms(idFromToken: string) {
@@ -71,10 +78,12 @@ export class ChatRoomsService {
                 const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id);
 
                 if (!room.isGroup) {
-                    const userInfor = chatParticipal.userInformations.find((infor) => infor.userId !== idFromToken);
-                    const user = await this.userModel.findById(userInfor.userId).exec(); // findById
+                    const userInformations = chatParticipal.userInformations.find(
+                        (infor) => infor.userId !== idFromToken,
+                    );
+                    const userInfor = await this.usersService.getDetail(userInformations.userId);
 
-                    item.name = user.fullName;
+                    item.name = userInfor.fullName;
                 }
 
                 const myInfor = chatParticipal.userInformations.find((infor) => infor.userId === idFromToken);
@@ -86,16 +95,17 @@ export class ChatRoomsService {
                     .exec();
 
                 if (lastMessage) {
-                    let nameUser = 'Bạn';
+                    let userName = 'Bạn';
 
                     if (room.isGroup && lastMessage.senderId !== idFromToken) {
-                        const user = await this.userModel.findById(lastMessage.senderId).exec(); // findById
-                        nameUser = user.fullName;
+                        const userInfor = await this.usersService.getDetail(lastMessage.senderId);
+
+                        userName = userInfor.fullName;
                     }
                     item.lastMessageInfor = {
                         createdAt: lastMessage.createdAt,
                         content: lastMessage.content,
-                        nameUser,
+                        userName,
                         hasRead: new Date(lastMessage.createdAt).getTime() <= new Date(lastTimeReading).getTime(),
                     };
                 }

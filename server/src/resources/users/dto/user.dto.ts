@@ -1,9 +1,11 @@
-import { IsNotEmpty } from 'class-validator';
+export class UserInfor {
+    id: string;
 
-export class UpdateUserReq {
-    @IsNotEmpty()
-    name: string;
+    fullName: string;
 
-    @IsNotEmpty()
+    avatar: string;
+
     phoneNumber: string;
+
+    email: string;
 }

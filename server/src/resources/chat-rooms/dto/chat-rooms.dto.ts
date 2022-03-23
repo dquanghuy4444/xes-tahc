@@ -1,5 +1,6 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
 import { Messenger } from 'resources/messengers/entities/messenger.entity';
+import { UserInfor } from 'resources/users/dto/user.dto';
 import { ChatRoom } from '../entities/chat-room.entity';
 
 export class CreateRoomReq {
@@ -23,7 +24,7 @@ export class UpdateRoomReq {
 
 interface IlastMessageInfor{
     content: string;
-    nameUser: string;
+    userName: string;
     createdAt: Date;
     hasRead: boolean;
 }
@@ -46,9 +47,11 @@ export class ChatRoomDescriptionResponse {
 
 export class ChatRoomDetailResponse extends ChatRoomDescriptionResponse {
     messengers: Messenger[];
+    userInfors: UserInfor[];
 
-    constructor(chatRoom: ChatRoom, messengers: Messenger[]) {
+    constructor(chatRoom: ChatRoom,userInfors: UserInfor[] , messengers: Messenger[]) {
         super(chatRoom);
         this.messengers = messengers;
+        this.userInfors = userInfors;
     }
 }
