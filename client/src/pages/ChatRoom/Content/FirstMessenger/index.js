@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 
 import AddReactionIcon from "@mui/icons-material/AddReaction"
 import EditIcon from "@mui/icons-material/Edit"
@@ -9,10 +9,16 @@ import { blue } from "@mui/material/colors"
 import { useStore } from "store"
 import { formatDatetime } from "utils/datetime"
 
+import ModalAddMember from "./ModalAddMember"
+import ModalChangeName from "./ModalChangeName"
+
 export default function FirstMessenger(){
     const roomInfor = useStore((state) => state.chatRoomInfor)
 
-    if(!roomInfor){
+    const [openModalChangeName, setOpenModalChangeName] = useState(false)
+    const [openModalAddMem, setOpenModalAddMem] = useState(false)
+
+    if (!roomInfor){
         return <></>
     }
 
@@ -46,7 +52,8 @@ export default function FirstMessenger(){
                         alignItems="center"
                         direction="column"
                         justifyContent="center"
-                        sx={ { minWidth: 100 } }
+                        sx={ { minWidth: 80 } }
+                        onClick={ () => setOpenModalAddMem(true) }
                     >
                         <Avatar
                             sx={ { bgcolor: blue[50], width: 48, height: 48, cursor: "pointer" } }
@@ -61,7 +68,8 @@ export default function FirstMessenger(){
                         alignItems="center"
                         direction="column"
                         justifyContent="center"
-                        sx={ { minWidth: 100 } }
+                        sx={ { minWidth: 80 } }
+                        onClick={ () => setOpenModalChangeName(true) }
                     >
                         <Avatar
                             sx={ { bgcolor: blue[50], width: 48, height: 48, cursor: "pointer" } }
@@ -76,7 +84,7 @@ export default function FirstMessenger(){
                         alignItems="center"
                         direction="column"
                         justifyContent="center"
-                        sx={ { minWidth: 100 } }
+                        sx={ { minWidth: 80 } }
                     >
                         <Avatar
                             sx={ { bgcolor: blue[50], width: 48, height: 48, cursor: "pointer" } }
@@ -92,17 +100,23 @@ export default function FirstMessenger(){
     }
 
     return (
-        <div className="flex-center flex-col mb-6">
-            <Avatar
-                alt="Remy Sharp"
-                className="border-border border-2"
-                src={ avatar }
-                sx={ { width: 120, height: 120 } }
-            />
+        <>
+            <ModalChangeName open={ openModalChangeName } setOpen={ setOpenModalChangeName } />
 
-            <p className="font-semibold mt-2">{ name }</p>
+            <ModalAddMember open={ openModalAddMem } setOpen={ setOpenModalAddMem } />
 
-            { showInforGroup() }
-        </div>
+            <div className="flex-center flex-col mb-6">
+                <Avatar
+                    alt="Remy Sharp"
+                    className="border-border border-2"
+                    src={ avatar }
+                    sx={ { width: 120, height: 120 } }
+                />
+
+                <p className="font-semibold mt-2">{ name }</p>
+
+                { showInforGroup() }
+            </div>
+        </>
     )
 }

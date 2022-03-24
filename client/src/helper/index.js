@@ -24,7 +24,7 @@ const fetchData = async(path, payload) => {
 const putData = async(path, idItem, data) => {
     try {
         const response = await axios.put(`${path}/${idItem}`, {
-            data
+            ...data
         })
 
         return handleTransformResponse(response)

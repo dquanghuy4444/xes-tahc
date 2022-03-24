@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 
 import AddIcon from "@mui/icons-material/Add"
 import SearchIcon from "@mui/icons-material/Search"
@@ -8,32 +8,35 @@ import FormControl from "@mui/material/FormControl"
 import InputAdornment from "@mui/material/InputAdornment"
 import InputLabel from "@mui/material/InputLabel"
 import OutlinedInput from "@mui/material/OutlinedInput"
-import useFetchData from "hooks/useFetchData"
+import useFetchDataNoSave from "hooks/useFetchDataNoSave"
+import { useStore } from "store"
 
 import ChatRoomCard from "./ChatRoomCard"
 
 const Sidebar = () => {
     const [search, setSearch] = useState("")
 
-    const cb = (res) => {
+    const chatRoomDescriptions = useStore((state) => state.chatRoomDescriptions)
+    const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
+
+
+    useFetchDataNoSave("chat-rooms/me", (res) => {
         const temp = res.sort((a, b) => {
             if (!a.lastMessageInfor){
                 return 1
             }
 
             if (b.lastMessageInfor){
-                return Date(a.lastMessageInfor.createAt).localeCompare(
-                    Date(b.lastMessageInfor.createAt)
+                return Date(a.lastMessageInfor.createdAt).localeCompare(
+                    Date(b.lastMessageInfor.createdAt)
                 )
             }
 
             return -1
         })
 
-        return temp
-    }
-
-    const data = useFetchData("chat-rooms/me", cb)
+        setChatRoomDescriptions(temp)
+    }, [])
 
     return (
         <section className="min-w-[360px] h-full border-border border-r-2 flex flex-col">
@@ -67,11 +70,9 @@ const Sidebar = () => {
             </div>
 
             <div className="overflow-auto px-4 pb-2">
-                { data?.length > 0 ? (
-                    data.map((item) => (
-                        <React.Fragment key={ item.id }>
-                            <ChatRoomCard info={ item } />
-                        </React.Fragment>
+                { chatRoomDescriptions?.length > 0 ? (
+                    chatRoomDescriptions.map((item) => (
+                        <ChatRoomCard info={ item } key={ item.id } />
                     ))
                 ) : (
                     <p className="text-center mt-4 font-semibold text-lg">

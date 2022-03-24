@@ -23,7 +23,7 @@ const Content = () => {
 
         return messengers.map((mess) => ({
             ...mess,
-            userInfor: userInfors.find((info) => info.id === mess.senderId)
+            userInfor: userInfors.find((info) => info.id === mess.createdBy)
         }))
     }, [roomInfor, messengers])
 

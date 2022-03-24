@@ -1,3 +1,5 @@
+import { ENUM_MESSAGE_TYPE } from "constants"
+
 import React, { useState } from "react"
 
 import InsertPhotoIcon from "@mui/icons-material/InsertPhoto"
@@ -6,9 +8,13 @@ import TextField from "@mui/material/TextField"
 import { postData } from "helper"
 import useEventListener from "hooks/useEventListener"
 import { useParams } from "react-router-dom"
+import { useStore } from "store"
 
 const Input = () => {
     const { id } = useParams()
+
+    const setMessengers = useStore((state) => state.setMessengers)
+
 
     const [message, setMessage] = useState("")
     const [isFocus, setIsFocus] = useState(true)
@@ -17,11 +23,14 @@ const Input = () => {
         if (!message){
             return
         }
-        await postData("messengers", {
+        const mess = await postData("messengers", {
             content    : message,
-            type       : "TEXT",
+            type       : ENUM_MESSAGE_TYPE.TEXT,
             chatRoomId : id
         })
+
+        setMessengers([mess])
+
 
         setMessage("")
     }

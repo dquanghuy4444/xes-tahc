@@ -9,11 +9,11 @@ import Header from "./Header"
 import "./index.css"
 
 const ChatRoom = () => {
+    const { id } = useParams()
+
     const myInfor = useStore((state) => state.myInfor)
     const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
     const setMessengers = useStore((state) => state.setMessengers)
-
-    const { id } = useParams()
 
     useFetchDataNoSave(`/messengers/${id}`, setMessengers, [id])
 
