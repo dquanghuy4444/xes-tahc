@@ -1,5 +1,4 @@
 import { IsNotEmpty, IsOptional } from 'class-validator';
-import { MessageAttachment, MessageInfo, MessageType, Messenger } from 'resources/messengers/entities/messenger.entity';
 import { UserInfor } from 'resources/users/dto/user.dto';
 import { ChatRoom } from '../entities/chat-room.entity';
 
@@ -35,43 +34,27 @@ export class ChatRoomDescriptionResponse {
     isGroup: boolean;
     avatar: string;
     lastMessageInfor: IlastMessageInfor;
+    createdBy: string;
+    createdAt: Date;
 
     constructor(chatRoom: ChatRoom) {
         this.id = chatRoom.id;
         this.name = chatRoom.name;
         this.avatar = chatRoom.avatar;
         this.isGroup = chatRoom.isGroup;
+        this.createdBy = chatRoom.createdBy;
+        this.createdAt = chatRoom.createdAt;
         this.lastMessageInfor = null;
     }
 }
 
-export class MessengerResponse {
-    type: MessageType;
-    chatRoomId: string;
-    senderId: string;
-    content?: string;
-    attachment?: MessageAttachment;
-    info?: MessageInfo;
-    createdAt: Date;
 
-    constructor(messenger: Messenger) {
-        this.type = messenger.type;
-        this.chatRoomId = messenger.chatRoomId;
-        this.senderId = messenger.senderId;
-        this.content = messenger.content;
-        this.attachment = messenger.attachment;
-        this.info = messenger.info;
-        this.createdAt = messenger.createdAt;
-    }
-}
 
 export class ChatRoomDetailResponse extends ChatRoomDescriptionResponse {
-    messengers: MessengerResponse[];
     userInfors: UserInfor[];
 
-    constructor(chatRoom: ChatRoom, userInfors: UserInfor[], messengers: Messenger[]) {
+    constructor(chatRoom: ChatRoom, userInfors: UserInfor[]) {
         super(chatRoom);
-        this.messengers = messengers;
         this.userInfors = userInfors;
     }
 }

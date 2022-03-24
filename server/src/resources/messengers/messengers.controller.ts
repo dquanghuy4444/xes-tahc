@@ -1,4 +1,4 @@
-import { Controller, Post, Body, UseInterceptors, UploadedFiles } from '@nestjs/common';
+import { Controller, Post, Body, UseInterceptors, UploadedFiles , Param , Get } from '@nestjs/common';
 import { MessengersService } from './messengers.service';
 import { ROUTER_MESSENGERS } from 'configs/routers';
 import { CreateMessengerByFilesReq, CreateMessengerReq } from './dto/messengers.dto';
@@ -14,6 +14,11 @@ export class MessengersController {
         return this.messengersService.create(createMessengerReq, idFromToken);
     }
 
+    @Get(':chatRoomId')
+    get(@IdFromToken() idFromToken: string, @Param('chatRoomId') chatRoomId: string) {
+        return this.messengersService.get(chatRoomId, idFromToken);
+    }
+
     @Post('files')
     @UseInterceptors(FastifyFilesInterceptor('files', 10))
     createByFiles(
@@ -21,6 +26,6 @@ export class MessengersController {
         @Body() createMessengerByFilesReq: CreateMessengerByFilesReq,
         @IdFromToken() idFromToken: string,
     ) {
-        return this.messengersService.createByFiles(createMessengerByFilesReq,files, idFromToken);
+        return this.messengersService.createByFiles(createMessengerByFilesReq, files, idFromToken);
     }
 }

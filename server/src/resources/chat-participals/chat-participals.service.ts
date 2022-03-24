@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateChatParticipalReq } from './dto/chat-participal.dto';
 import { Model } from 'mongoose';
@@ -13,9 +13,13 @@ export class ChatParticipalsService {
         await this.chatParticipalModel.create(createChatParticipalReq);
     }
 
-    async getDetailByChatRoomId(chatRoomId: string){
-        const chatParticipal = await this.chatParticipalModel.findOne({chatRoomId}).exec();
-
-        return chatParticipal
+    async getDetailByChatRoomId(chatRoomId: string, userId: string) {
+        const chatParticipal = await this.chatParticipalModel
+            .findOne({ chatRoomId, userInformations: { $elemMatch: { userId } } })
+            .exec();
+        if (!chatParticipal) {
+            throw new BadRequestException('Wrong chat! Please try again');
+        }
+        return chatParticipal;
     }
 }

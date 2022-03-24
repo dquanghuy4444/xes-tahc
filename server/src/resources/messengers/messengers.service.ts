@@ -1,15 +1,16 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from 'resources/users/entities/user.entity';
 import { Model } from 'mongoose';
-import { CreateMessengerReq, CreateMessengerByFilesReq } from './dto/messengers.dto';
+import { CreateMessengerReq, CreateMessengerByFilesReq , MessengerResponse } from './dto/messengers.dto';
 import { ChatRoom } from 'resources/chat-rooms/entities/chat-room.entity';
 import { MessageType, Messenger } from './entities/messenger.entity';
+import { ChatParticipalsService } from 'resources/chat-participals/chat-participals.service';
 
 @Injectable()
 export class MessengersService {
     constructor(
-        @InjectModel(User.name) private userModel: Model<User>,
+        private readonly chatParticipalsService: ChatParticipalsService,
+
         @InjectModel(ChatRoom.name) private chatRoomModel: Model<ChatRoom>,
         @InjectModel(Messenger.name) private messengerModel: Model<Messenger>,
     ) {}
@@ -38,6 +39,14 @@ export class MessengersService {
             senderId: idFromToken,
         });
         return '';
+    }
+
+    async get(chatRoomId: string, idFromToken: string) {
+        await this.chatParticipalsService.getDetailByChatRoomId(chatRoomId, idFromToken);
+
+        const messengers = await this.messengerModel.find({ chatRoomId });
+
+        return messengers.map((mess) => new MessengerResponse(mess));
     }
 
     async createByFiles(

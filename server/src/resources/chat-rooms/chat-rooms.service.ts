@@ -45,13 +45,7 @@ export class ChatRoomsService {
     }
 
     async getDetail(chatRoomId: string, idFromToken: string) {
-        const room = await this.chatRoomModel.findOne({ _id: chatRoomId }).exec(); // findById
-
-        const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id);
-
-        if (!room || !chatParticipal.userInformations.some((infor) => infor.userId === idFromToken)) {
-            throw new BadRequestException('Wrong chat! Please try again');
-        }
+        const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(chatRoomId , idFromToken);
 
         const userInfors = [];
         await Promise.all(
@@ -62,9 +56,10 @@ export class ChatRoomsService {
                 }
             }),
         );
-        const messengers = await this.messengerModel.find({ chatRoomId: chatRoomId });
 
-        return new ChatRoomDetailResponse(room, userInfors, messengers);
+        const room = await this.chatRoomModel.findById(chatRoomId).exec(); // findById
+
+        return new ChatRoomDetailResponse(room, userInfors);
     }
 
     async getMyChatRooms(idFromToken: string) {
@@ -75,7 +70,7 @@ export class ChatRoomsService {
         await Promise.all(
             rooms.map(async (room) => {
                 const item = new ChatRoomDescriptionResponse(room);
-                const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id);
+                const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id , idFromToken);
 
                 if (!room.isGroup) {
                     const userInformations = chatParticipal.userInformations.find(
@@ -119,11 +114,8 @@ export class ChatRoomsService {
 
     async update(chatRoomId: string, updateRoomChatReq: UpdateRoomReq, idFromToken: string) {
         const room = await this.chatRoomModel.findOne({ _id: chatRoomId }).exec();
-        const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id);
+        await this.chatParticipalsService.getDetailByChatRoomId(room.id , idFromToken);
 
-        if (!room || !chatParticipal.userInformations.some((infor) => infor.userId === idFromToken)) {
-            throw new BadRequestException('Wrong chat! Please try again');
-        }
 
         const { name, avatar } = updateRoomChatReq;
 
