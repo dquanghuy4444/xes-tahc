@@ -5,8 +5,11 @@ import SendIcon from "@mui/icons-material/Send"
 import TextField from "@mui/material/TextField"
 import { postData } from "helper"
 import useEventListener from "hooks/useEventListener"
+import { useParams } from "react-router-dom"
 
-const Input = ({ id }) => {
+const Input = () => {
+    const { id } = useParams()
+
     const [message, setMessage] = useState("")
     const [isFocus, setIsFocus] = useState(true)
 

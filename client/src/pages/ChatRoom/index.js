@@ -1,6 +1,6 @@
 import React from "react"
 
-import useFetchData from "hooks/useFetchData"
+import useFetchDataNoSave from "hooks/useFetchDataNoSave"
 import { useParams } from "react-router-dom"
 import { useStore } from "store"
 
@@ -10,38 +10,31 @@ import "./index.css"
 
 const ChatRoom = () => {
     const myInfor = useStore((state) => state.myInfor)
+    const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
+    const setMessengers = useStore((state) => state.setMessengers)
 
     const { id } = useParams()
 
-    const roomInfor = useFetchData(`/chat-rooms/${id}`, null, [id])
+    useFetchDataNoSave(`/messengers/${id}`, setMessengers, [id])
 
-    const messengers = useFetchData(`/messengers/${id}`, null, [id])
-
-    const userInfors =
-        roomInfor?.userInfors && myInfor
-            ? [
-                  ...roomInfor.userInfors,
-                  {
-                      ...myInfor,
-                      isMe: true
-                  }
-              ]
-            : []
+    useFetchDataNoSave(`/chat-rooms/${id}`, (res) => {
+        setChatRoomInfor({
+            ...res,
+            userInfors: [
+                ...res.userInfors,
+                {
+                    ...myInfor,
+                    isMe: true
+                }
+            ]
+        })
+    }, [id , myInfor])
 
     return (
         <div className="h-full chat-room">
-            <Header avatar={ roomInfor?.avatar } id={ id } name={ roomInfor?.name } />
+            <Header />
 
-            <Content
-                avatar={ roomInfor?.avatar }
-                createdAt={ roomInfor?.createdAt }
-                createdBy={ roomInfor?.createdBy }
-                id={ id }
-                isGroup={ roomInfor?.isGroup }
-                messengers={ messengers || [] }
-                name={ roomInfor?.name }
-                userInfors={ userInfors }
-            />
+            <Content />
         </div>
     )
 }
