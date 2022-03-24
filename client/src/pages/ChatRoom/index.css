@@ -1,6 +1,11 @@
-.chat {
+.chat-room {
     height: calc(100% - 64px);
 }
+
 .content-chat {
     height: calc(100% - 60px);
+}
+
+.chat {
+    width: calc(100vw - 360px);
 }
