@@ -6,7 +6,7 @@ import Box from "@mui/material/Box"
 import { blue, teal } from "@mui/material/colors"
 
 export default function MessengerCard({ userInfor, content, type, info }){
-    console.log(userInfor);
+
     const showContent = () => {
         if (type === ENUM_MESSAGE_TYPE.TEXT){
             return (

@@ -6,7 +6,6 @@ const useFetchDataNoSave = (path, cb, deps = []) => {
     useEffect(() => {
         const getDataFromServer = async() => {
             const res = await fetchData(path)
-            console.log(res)
             cb(res)
         }
 
