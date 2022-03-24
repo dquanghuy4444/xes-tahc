@@ -1,16 +1,16 @@
 import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
-import { MessageAttachment, MessageInfo, MessageType, Messenger } from '../entities/messenger.entity';
+import { MessageAttachment, MessageInfo, ENUM_MESSAGE_TYPE, Messenger } from '../entities/messenger.entity';
 
 export class CreateMessengerReq {
     @IsNotEmpty()
-    @IsEnum(MessageType, { each: true })
-    type: MessageType;
+    @IsEnum(ENUM_MESSAGE_TYPE, { each: true })
+    type: ENUM_MESSAGE_TYPE;
 
     @IsNotEmpty()
     chatRoomId: string;
 
     @IsOptional()
-    content?: string;
+    content = '';
 
     @IsOptional()
     info?: MessageInfo;
@@ -23,9 +23,9 @@ export class CreateMessengerByFilesReq {
 
 export class MessengerResponse {
     id: string;
-    type: MessageType;
+    type: ENUM_MESSAGE_TYPE;
     chatRoomId: string;
-    senderId: string;
+    createdBy: string;
     content?: string;
     attachment?: MessageAttachment;
     info?: MessageInfo;
@@ -35,7 +35,7 @@ export class MessengerResponse {
         this.id = messenger.id;
         this.type = messenger.type;
         this.chatRoomId = messenger.chatRoomId;
-        this.senderId = messenger.senderId;
+        this.createdBy = messenger.createdBy;
         this.content = messenger.content;
         this.attachment = messenger.attachment;
         this.info = messenger.info;

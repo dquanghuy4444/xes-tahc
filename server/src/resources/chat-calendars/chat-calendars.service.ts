@@ -31,7 +31,7 @@ export class ChatCalendarsService {
         //     content,
         //     type,
         //     time,
-        //     senderId: idFromToken,
+        //     createdBy: idFromToken,
         //     chatRoomId: chatRoom.id,
         //     createAt: Date.now(),
         // });

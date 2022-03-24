@@ -23,7 +23,7 @@ export class ChatRoomsService {
     ) {}
 
     async create(createRoomChatReq: CreateRoomReq, idFromToken: string) {
-        await this.usersService.getDetail(idFromToken);
+        const me = await this.usersService.getDetail(idFromToken);
 
         const { name, userIds, isGroup, avatar } = createRoomChatReq;
         const chatRoom = await this.chatRoomModel.create({
@@ -36,6 +36,8 @@ export class ChatRoomsService {
         const userInformations: IUserInformation[] = [idFromToken, ...userIds].map((userId) => ({
             userId,
             lastTimeReading: Date.now(),
+            addedBy:me.id,
+            stillIn:true
         }));
         await this.chatParticipalsService.create({
             chatRoomId: chatRoom.id,
@@ -45,7 +47,7 @@ export class ChatRoomsService {
     }
 
     async getDetail(chatRoomId: string, idFromToken: string) {
-        const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(chatRoomId , idFromToken);
+        const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(chatRoomId, idFromToken);
 
         const userInfors = [];
         await Promise.all(
@@ -59,7 +61,12 @@ export class ChatRoomsService {
 
         const room = await this.chatRoomModel.findById(chatRoomId).exec(); // findById
 
-        return new ChatRoomDetailResponse(room, userInfors);
+        const result = new ChatRoomDetailResponse(room, userInfors)
+        if(!result.isGroup){
+            result.name = userInfors[0].fullName
+            result.avatar = userInfors[0].avatar
+        }
+        return result;
     }
 
     async getMyChatRooms(idFromToken: string) {
@@ -70,7 +77,7 @@ export class ChatRoomsService {
         await Promise.all(
             rooms.map(async (room) => {
                 const item = new ChatRoomDescriptionResponse(room);
-                const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id , idFromToken);
+                const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id, idFromToken);
 
                 if (!room.isGroup) {
                     const userInformations = chatParticipal.userInformations.find(
@@ -79,6 +86,7 @@ export class ChatRoomsService {
                     const userInfor = await this.usersService.getDetail(userInformations.userId);
 
                     item.name = userInfor.fullName;
+                    item.avatar = userInfor.avatar;
                 }
 
                 const myInfor = chatParticipal.userInformations.find((infor) => infor.userId === idFromToken);
@@ -92,8 +100,8 @@ export class ChatRoomsService {
                 if (lastMessage) {
                     let userName = 'Bạn';
 
-                    if (room.isGroup && lastMessage.senderId !== idFromToken) {
-                        const userInfor = await this.usersService.getDetail(lastMessage.senderId);
+                    if (room.isGroup && lastMessage.createdBy !== idFromToken) {
+                        const userInfor = await this.usersService.getDetail(lastMessage.createdBy);
 
                         userName = userInfor.fullName;
                     }
@@ -113,9 +121,8 @@ export class ChatRoomsService {
     }
 
     async update(chatRoomId: string, updateRoomChatReq: UpdateRoomReq, idFromToken: string) {
-        const room = await this.chatRoomModel.findOne({ _id: chatRoomId }).exec();
-        await this.chatParticipalsService.getDetailByChatRoomId(room.id , idFromToken);
-
+        const room = await this.chatRoomModel.findById(chatRoomId).exec();
+        await this.chatParticipalsService.getDetailByChatRoomId(room.id, idFromToken);
 
         const { name, avatar } = updateRoomChatReq;
 

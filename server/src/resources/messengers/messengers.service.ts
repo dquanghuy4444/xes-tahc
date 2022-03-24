@@ -3,7 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { CreateMessengerReq, CreateMessengerByFilesReq , MessengerResponse } from './dto/messengers.dto';
 import { ChatRoom } from 'resources/chat-rooms/entities/chat-room.entity';
-import { MessageType, Messenger } from './entities/messenger.entity';
+import { ENUM_MESSAGE_TYPE, Messenger } from './entities/messenger.entity';
 import { ChatParticipalsService } from 'resources/chat-participals/chat-participals.service';
 
 @Injectable()
@@ -27,18 +27,17 @@ export class MessengersService {
             chatRoomId,
         };
 
-        if (type === MessageType.TEXT && createMessengerReq.content) {
-            doc.content = createMessengerReq.content;
-        }
-        if (type === MessageType.INFO && createMessengerReq.info) {
+        doc.content = createMessengerReq.content;
+
+        if (type === ENUM_MESSAGE_TYPE.INFO && createMessengerReq.info) {
             doc.info = createMessengerReq.info;
         }
 
-        await this.messengerModel.create({
+        const result = await this.messengerModel.create({
             ...doc,
-            senderId: idFromToken,
+            createdBy: idFromToken,
         });
-        return '';
+        return result;
     }
 
     async get(chatRoomId: string, idFromToken: string) {

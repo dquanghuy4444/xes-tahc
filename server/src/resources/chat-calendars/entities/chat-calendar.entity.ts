@@ -8,7 +8,7 @@ export enum ChatCalendarType {
 @Schema()
 export class ChatCalendar extends Document {
     @Prop()
-    senderId: string;
+    createdBy: string;
     @Prop()
     content: string;
     @Prop()

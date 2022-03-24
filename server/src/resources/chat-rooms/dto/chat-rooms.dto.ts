@@ -17,7 +17,11 @@ export class CreateRoomReq {
 }
 
 export class UpdateRoomReq {
+    @IsOptional()
+    @IsNotEmpty()
     name: string;
+
+    @IsOptional()
     avatar: string;
 }
 

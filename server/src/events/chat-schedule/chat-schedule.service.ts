@@ -4,7 +4,7 @@ import { Cron, CronExpression } from '@nestjs/schedule';
 import { IdFromToken } from 'common/decorators/auth.decorator';
 import { Model } from 'mongoose';
 import { ChatCalendar, ChatCalendarType } from 'resources/chat-calendars/entities/chat-calendar.entity';
-import { MessageType } from 'resources/messengers/entities/messenger.entity';
+import { ENUM_MESSAGE_TYPE } from 'resources/messengers/entities/messenger.entity';
 import { MessengersService } from 'resources/messengers/messengers.service';
 
 const NAME_CHAT_SCHEDULE = 'NAME_CHAT_SCHEDULE';
@@ -29,7 +29,7 @@ export class ChatScheduleService {
                 await this.messengersService.create(
                     {
                         chatRoomId: cal.chatRoomId,
-                        type: MessageType.TEXT,
+                        type: ENUM_MESSAGE_TYPE.TEXT,
                         content: cal.content,
                     },
                     idFromToken,

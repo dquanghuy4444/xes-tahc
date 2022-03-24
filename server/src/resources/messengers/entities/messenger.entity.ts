@@ -1,22 +1,23 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 
-export enum MessageType {
+export enum ENUM_MESSAGE_TYPE {
     INFO = 'INFO',
     TEXT = 'TEXT',
     IMAGE = 'IMAGE',
 }
 
-export enum MessageInfoType {
+export enum ENUM_MESSAGE_INFO_TYPE {
     JOIN_CHAT = 'JOIN_CHAT',
     LEAVE_CHAT = 'LEAVE_CHAT',
     INVITED = 'INVITED',
     REJECTED = 'REJECTED',
+    CHANGE_NAME_GROUP = 'CHANGE_NAME_GROUP',
 }
 
 export class MessageInfo {
-    type: MessageInfoType;
-    byUserId?: string;
+    type: ENUM_MESSAGE_INFO_TYPE;
+    victim?: string;
 }
 
 export class MessageAttachment {
@@ -27,11 +28,11 @@ export class MessageAttachment {
 @Schema()
 export class Messenger extends Document {
     @Prop()
-    type: MessageType;
+    type: ENUM_MESSAGE_TYPE;
     @Prop()
     chatRoomId: string;
     @Prop()
-    senderId: string;
+    createdBy: string;
     @Prop()
     content?: string;
     @Prop()
