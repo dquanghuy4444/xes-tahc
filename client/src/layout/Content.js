@@ -2,7 +2,7 @@ import React from 'react';
 
 const Content = ({children}) => {
     return (
-        <section>
+        <section className="w-full">
             { children }
         </section>
     );

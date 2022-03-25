@@ -1,4 +1,4 @@
-import { ENUM_MESSAGE_TYPE , ENUM_MESSAGE_INFO_TYPE } from "constants"
+import { ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
 
 import React from "react"
 
@@ -7,7 +7,7 @@ import Avatar from "@mui/material/Avatar"
 import moment from "moment"
 import { useNavigate } from "react-router-dom"
 
-const ChatRoomCard = ({ info }) => {
+const ChatRoomCard = ({ info, isActive }) => {
     const { lastMessengerInfor, avatar, name, id } = info
 
     const navigate = useNavigate()
@@ -32,14 +32,14 @@ const ChatRoomCard = ({ info }) => {
         if (!lastMessengerInfor){
             return "Chưa có tin nhắn nào"
         }
-        if(lastMessengerInfor.type === ENUM_MESSAGE_TYPE.TEXT){
+        if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.TEXT){
             return `${lastMessengerInfor.userName} : ${lastMessengerInfor.content}`
         }
-        if(lastMessengerInfor.type === ENUM_MESSAGE_TYPE.INFO){
-            if(lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
+        if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.INFO){
+            if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
                 return `${lastMessengerInfor.userName} đã đổi tên nhóm`
             }
-            if(lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER){
+            if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER){
                 return `${lastMessengerInfor.userName} đã thêm thành viên`
             }
         }
@@ -49,7 +49,9 @@ const ChatRoomCard = ({ info }) => {
 
     return (
         <div
-            className="flex cursor-pointer hover:bg-hover p-2 rounded-md items-center"
+            className={ `flex cursor-pointer p-2 rounded-md items-center ${
+                isActive ? "bg-hover" : "hover:bg-hover"
+            }` }
             onClick={ handleRedirectToChatRoom }
         >
             <Avatar alt="Remy Sharp" src={ avatar } sx={ { width: 48, height: 48 } } />

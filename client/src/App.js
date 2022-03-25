@@ -1,11 +1,13 @@
 import React, { useEffect, useState, Suspense } from "react"
 
-import {UserApiPath} from "configs/api-paths"
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+import { UserApiPath } from "configs/api-paths"
 import { fetchData } from "helper"
 import Layout from "layout"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import { ToastContainer } from "react-toastify"
-import { useStore } from 'store'
+import { useStore } from "store"
 
 const routes = [
     {
@@ -70,6 +72,7 @@ const App = () => {
 
         return (
             <Route
+
                 key={ route.path }
                 { ...route }
                 element={
@@ -92,7 +95,16 @@ const App = () => {
             <ToastContainer />
 
             <BrowserRouter>
-                <Suspense fallback={ <div>Loading...</div> }>
+                <Suspense
+                    fallback={ (
+                        <Backdrop
+                            open={ true }
+                            sx={ { color: "#fff", zIndex: (theme) => theme.zIndex.drawer + 1 } }
+                        >
+                            <CircularProgress color="inherit" />
+                        </Backdrop>
+                      ) }
+                >
                     <Routes>{ routes.map(createRoute) }</Routes>
                 </Suspense>
             </BrowserRouter>

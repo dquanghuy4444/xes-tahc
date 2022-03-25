@@ -1,24 +1,25 @@
-import { ENUM_UPDATE_MEMBER_TYPE, ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
-
 import React, { useState, useEffect } from "react"
 
 import { Avatar, Button, Stack } from "@mui/material"
 import Checkbox from "@mui/material/Checkbox"
+import TextField from "@mui/material/TextField"
 import AvatarWithClose from "components/AvatarWithClose"
 import Modal from "components/Modal"
 import SearchInput from "components/SearchInput"
-import { UserApiPath, ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
-import { fetchData, putData, postData } from "helper"
+import { UserApiPath, ChatRoomApiPath } from "configs/api-paths"
+import { fetchData, postData } from "helper"
+import { useNavigate } from "react-router-dom"
 import { useStore } from "store"
 import { showNotification } from "utils"
 
-const ModalAddMember = ({ open, setOpen }) => {
-    const roomInfor = useStore((state) => state.chatRoomInfor)
-    const setMessengers = useStore((state) => state.setMessengers)
-    const chatRoomInfor = useStore((state) => state.chatRoomInfor)
-    const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
+const ModalCreateRoom = ({ open, setOpen }) => {
+    const myInfor = useStore((state) => state.myInfor)
+    const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
+
+    const navigate = useNavigate()
 
     const [search, setSearch] = useState("")
+    const [name, setName] = useState("")
     const [suggestUsers, setSuggestUsers] = useState([])
     const [chooseUsers, setChooseUsers] = useState([])
 
@@ -26,11 +27,7 @@ const ModalAddMember = ({ open, setOpen }) => {
         const getSuggestUsers = async() => {
             if (!open) return
 
-            const res = await fetchData(
-                UserApiPath.suggestUsers(
-                    roomInfor?.userInfors.filter((info) => info.stillIn).map((info) => info.id)
-                )
-            )
+            const res = await fetchData(UserApiPath.suggestUsers([myInfor.id]))
 
             setSuggestUsers(res)
         }
@@ -38,44 +35,28 @@ const ModalAddMember = ({ open, setOpen }) => {
         getSuggestUsers()
     }, [open])
 
-    const handleAddMember = async() => {
+    const handleCreateRoom = async() => {
         if (chooseUsers.length === 0) return
 
-        const res = await putData(ChatRoomApiPath.member(roomInfor.id), {
-            type    : ENUM_UPDATE_MEMBER_TYPE.ADD,
+        const res = await postData(ChatRoomApiPath.index, {
+            name,
+            isGroup : true,
             userIds : chooseUsers.map((info) => info.id)
         })
 
         if (res){
+            setName("")
             setChooseUsers([])
             setSearch("")
-            const arrMess = []
-            await Promise.all(
-                chooseUsers.map(async(info) => {
-                    const mess = await postData(MessengerApiPath.index, {
-                        content : "",
-                        type    : ENUM_MESSAGE_TYPE.INFO,
-                        info    : {
-                            type   : ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER,
-                            victim : info.id
-                        },
-                        chatRoomId: roomInfor.id
-                    })
-                    arrMess.push(mess)
-                })
-            )
-
-            // setChatRoomInfor({
-            //     ...chatRoomInfor,
-            //     userInfors: {
-            //         ...chatRoomInfor.userInfors,
-            //         ...chooseUsers
-            //     }
-            // })
-
-            setMessengers(arrMess)
-            showNotification("success", "Bạn đã thêm thành viên thành công")
+            setChatRoomDescriptions([
+                {
+                    ...res,
+                    lastMessengerInfor: null
+                }
+            ])
+            showNotification("success", "Bạn đã tạo phòng thành công")
             setOpen(false)
+            navigate(`/room/${res.id}`, { replace: true })
         }
     }
 
@@ -120,7 +101,7 @@ const ModalAddMember = ({ open, setOpen }) => {
 
     const showChooseUsers = () => {
         return (
-            <div className="h-[100px] flex items-center">
+            <div className="h-[100px] flex items-center space-x-2">
                 { chooseUsers.length === 0 && (
                     <p className="text-center w-full text-quinary">Chưa chọn người nào</p>
                 ) }
@@ -147,10 +128,20 @@ const ModalAddMember = ({ open, setOpen }) => {
         <Modal close={ () => setOpen(false) } open={ open }>
             <div className="w-[500px]">
                 <div className="relative py-4 border-b-2 border-border">
-                    <p className="text-center font-semibold text-xl">Thêm người</p>
+                    <p className="text-center font-semibold text-xl">Tạo nhóm</p>
                 </div>
 
                 <div className="p-4">
+                    <TextField
+                        fullWidth
+                        id="outlined-required"
+                        label="Tên phòng"
+                        size="small"
+                        sx={ { mb: 2 } }
+                        value={ name }
+                        onChange={ (e) => setName(e.target.value) }
+                    />
+
                     <SearchInput value={ search } onChange={ (e) => setSearch(e.target.value) } />
 
                     { showChooseUsers() }
@@ -161,12 +152,12 @@ const ModalAddMember = ({ open, setOpen }) => {
 
                     <Button
                         fullWidth
-                        disabled={ chooseUsers.length === 0 }
+                        disabled={ chooseUsers.length === 0 || !name }
                         sx={ { mt: 4 } }
                         variant="contained"
-                        onClick={ handleAddMember }
+                        onClick={ handleCreateRoom }
                     >
-                        Thêm người
+                        Tạo nhóm
                     </Button>
                 </div>
             </div>
@@ -174,4 +165,4 @@ const ModalAddMember = ({ open, setOpen }) => {
     )
 }
 
-export default ModalAddMember
+export default ModalCreateRoom

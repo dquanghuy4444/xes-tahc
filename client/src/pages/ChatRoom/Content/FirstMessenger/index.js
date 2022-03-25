@@ -11,12 +11,14 @@ import { formatDatetime } from "utils/datetime"
 
 import ModalAddMember from "./ModalAddMember"
 import ModalChangeName from "./ModalChangeName"
+import ModalShowMembers from "./ModalShowMembers"
 
 export default function FirstMessenger(){
     const roomInfor = useStore((state) => state.chatRoomInfor)
 
     const [openModalChangeName, setOpenModalChangeName] = useState(false)
     const [openModalAddMem, setOpenModalAddMem] = useState(false)
+    const [openModalShowMembers, setOpenModalShowMembers] = useState(false)
 
     if (!roomInfor){
         return <></>
@@ -43,6 +45,8 @@ export default function FirstMessenger(){
                 <ModalChangeName open={ openModalChangeName } setOpen={ setOpenModalChangeName } />
 
                 <ModalAddMember open={ openModalAddMem } setOpen={ setOpenModalAddMem } />
+
+                <ModalShowMembers open={ openModalShowMembers } setOpen={ setOpenModalShowMembers } />
 
                 <div>
                     <p className="text-quinary text-sm">
@@ -90,6 +94,8 @@ export default function FirstMessenger(){
                             direction="column"
                             justifyContent="center"
                             sx={ { minWidth: 80 } }
+                            onClick={ () => setOpenModalShowMembers(true) }
+
                         >
                             <Avatar
                                 sx={ { bgcolor: blue[50], width: 48, height: 48, cursor: "pointer" } }

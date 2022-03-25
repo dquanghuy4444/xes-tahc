@@ -8,19 +8,33 @@ export const useStore = create((set) => ({
             myInfor: newInfo
         })),
     chatRoomInfor    : null,
-    setChatRoomInfor : (newInfo) =>
+    setChatRoomInfor : (newInfo) => {
+        if (!newInfo){
+            set((state) => ({
+                ...state,
+                chatRoomInfor: null
+            }))
+
+            return
+        }
         set((state) => ({
             ...state,
             chatRoomInfor: {
                 ...state.chatRoomInfor,
                 ...newInfo
             }
-        })),
+        }))
+    },
     messengers    : [],
     setMessengers : (newMess) =>
         set((state) => ({
             ...state,
-            messengers: newMess.length === 0 ? [] : [...state.messengers , ...newMess]
+            messengers: newMess.length === 0 ? [] : [...state.messengers, ...newMess]
+        })),
+    setNewMessengers : (newMess) =>
+        set((state) => ({
+            ...state,
+            messengers: newMess
         })),
     chatRoomDescriptions    : [],
     setChatRoomDescriptions : (newDesc) =>

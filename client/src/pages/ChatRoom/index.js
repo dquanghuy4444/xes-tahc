@@ -1,5 +1,6 @@
 import React from "react"
 
+import ChatIcon from "@mui/icons-material/Chat"
 import { ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
 import useFetchDataNoSave from "hooks/useFetchDataNoSave"
 import { useParams } from "react-router-dom"
@@ -13,21 +14,29 @@ const ChatRoom = () => {
     const { id } = useParams()
 
     const myInfor = useStore((state) => state.myInfor)
+    const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
-    const setMessengers = useStore((state) => state.setMessengers)
+    const setNewMessengers = useStore((state) => state.setNewMessengers)
 
-    useFetchDataNoSave(MessengerApiPath.messengersInRoom(id), setMessengers, [id])
+    useFetchDataNoSave(MessengerApiPath.messengersInRoom(id), setNewMessengers, [id])
 
     useFetchDataNoSave(
         ChatRoomApiPath.chatRoomDetail(id),
         (res) => {
+            if (!res){
+                setChatRoomInfor(null)
+
+                return
+            }
             setChatRoomInfor({
                 ...res,
                 userInfors: [
                     ...res.userInfors,
                     {
                         ...myInfor,
-                        isMe: true
+                        userId  : myInfor.id,
+                        stillIn : true,
+                        isMe    : true
                     }
                 ]
             })
@@ -37,9 +46,21 @@ const ChatRoom = () => {
 
     return (
         <div className="h-full chat-room">
-            <Header />
+            { chatRoomInfor ? (
+                <>
+                    <Header />
 
-            <Content />
+                    <Content />
+                </>
+            ) : (
+                <div className="w-full h-full flex-center flex-col space-y-6">
+                    <ChatIcon sx={ { fontSize: 120 } } />
+
+                    <p className="text-xl font-semibold">
+                        Hãy chọn một đoạn chat hoặc bắt đầu cuộc trò chuyện mới
+                    </p>
+                </div>
+            ) }
         </div>
     )
 }

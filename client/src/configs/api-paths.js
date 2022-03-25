@@ -2,7 +2,7 @@ export const ChatRoomApiPath = new (function(){
     (this.index = "chat-rooms"),
         (this.myChatRoom = `${this.index}/me`),
         (this.chatRoomDetail = (id) => `${this.index}/${id}`),
-        (this.addMember = (id) => `${this.index}/${id}/member`)
+        (this.member = (id) => `${this.index}/${id}/member`)
 })()
 
 export const MessengerApiPath = new (function(){
