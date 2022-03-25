@@ -1,4 +1,4 @@
-import { IsEnum, IsNotEmpty, IsOptional } from 'class-validator';
+import { ArrayMinSize, IsArray, IsEnum, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { ENUM_MESSAGE_TYPE, MessageInfo } from 'resources/messengers/entities/messenger.entity';
 import { UserInfor } from 'resources/users/dto/user.dto';
 import { ChatRoom } from '../entities/chat-room.entity';
@@ -28,6 +28,7 @@ export class UpdateRoomReq {
     name: string;
 
     @IsOptional()
+
     avatar: string;
 }
 
@@ -37,6 +38,9 @@ export class UpdateMemberReq {
     type: ENUM_UPDATE_MEMBER_TYPE;
 
     @IsNotEmpty()
+    @ArrayMinSize(1)
+    @IsArray()
+    @IsString({each: true})
     userIds: string[];
 }
 
@@ -49,12 +53,11 @@ interface ILastMessengerInfor {
     info?: MessageInfo;
 }
 
-export class ChatRoomDescriptionResponse {
+export class ChatRoomResponse {
     id: string;
     name: string;
     isGroup: boolean;
     avatar: string;
-    lastMessengerInfor: ILastMessengerInfor;
     createdBy: string;
     createdAt: Date;
 
@@ -65,6 +68,14 @@ export class ChatRoomDescriptionResponse {
         this.isGroup = chatRoom.isGroup;
         this.createdBy = chatRoom.createdBy;
         this.createdAt = chatRoom.createdAt;
+    }
+}
+export class ChatRoomDescriptionResponse extends ChatRoomResponse{
+    lastMessengerInfor: ILastMessengerInfor;
+
+    constructor(chatRoom: ChatRoom) {
+        super(chatRoom);
+
         this.lastMessengerInfor = null;
     }
 }

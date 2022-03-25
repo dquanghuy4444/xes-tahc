@@ -14,7 +14,7 @@ export class ChatParticipalsService {
 
     async getDetailByChatRoomId(chatRoomId: string, userId: string) {
         const chatParticipal = await this.chatParticipalModel
-            .findOne({ chatRoomId, userInformations: { $elemMatch: { userId } } })
+            .findOne({ chatRoomId, userInformations: { $elemMatch: { userId, stillIn: true } } })
             .exec();
         if (!chatParticipal) {
             throw new BadRequestException('Wrong chat! Please try again');
@@ -42,10 +42,30 @@ export class ChatParticipalsService {
             return info;
         });
 
-        const userInformations = await chatParticipal.update({
+        await chatParticipal.update({
             userInformations: [...newUserInformations, ...temp],
         });
 
+        return true;
+    }
+
+    async removeMember(chatRoomId: string, removedUserId: string, userId: string) {
+        const chatParticipal = await this.getDetailByChatRoomId(chatRoomId, userId);
+
+        const newUserInformations = chatParticipal.userInformations.map((info) => {
+            if (removedUserId === info.userId) {
+                return {
+                    ...info,
+                    stillIn: false,
+                };
+            }
+
+            return info;
+        });
+
+        await chatParticipal.update({
+            userInformations: newUserInformations,
+        });
         return true;
     }
 }

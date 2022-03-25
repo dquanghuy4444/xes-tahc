@@ -1,20 +1,20 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import {
     ChatRoomDescriptionResponse,
     ChatRoomDetailResponse,
+    ChatRoomResponse,
     CreateRoomReq,
     ENUM_UPDATE_MEMBER_TYPE,
     UpdateMemberReq,
     UpdateRoomReq,
 } from './dto/chat-rooms.dto';
-import { Model, Types } from 'mongoose';
+import { Model } from 'mongoose';
 import { ChatRoom } from './entities/chat-room.entity';
 import { Messenger } from 'resources/messengers/entities/messenger.entity';
 import { ChatParticipalsService } from 'resources/chat-participals/chat-participals.service';
-import { IUserInformation } from 'resources/chat-participals/entities/chat-participal.entity';
+import { ChatParticipal, IUserInformation } from 'resources/chat-participals/entities/chat-participal.entity';
 import { UsersService } from 'resources/users/users.service';
-import { info } from 'console';
 
 @Injectable()
 export class ChatRoomsService {
@@ -22,6 +22,7 @@ export class ChatRoomsService {
         private readonly chatParticipalsService: ChatParticipalsService,
         private readonly usersService: UsersService,
         @InjectModel(ChatRoom.name) private chatRoomModel: Model<ChatRoom>,
+        @InjectModel(ChatParticipal.name) private chatParticipalModel: Model<ChatParticipal>,
         @InjectModel(Messenger.name) private messengerModel: Model<Messenger>,
     ) {}
 
@@ -47,7 +48,7 @@ export class ChatRoomsService {
             chatRoomId: chatRoom.id,
             userInformations,
         });
-        return chatRoom;
+        return new ChatRoomResponse(chatRoom);
     }
 
     async getDetail(chatRoomId: string, idFromToken: string) {
@@ -60,7 +61,7 @@ export class ChatRoomsService {
                     const userInfor = await this.usersService.getDetail(infor.userId);
                     userInfors.push({
                         ...infor,
-                        ...userInfor
+                        ...userInfor,
                     });
                 }
             }),
@@ -84,8 +85,15 @@ export class ChatRoomsService {
         await Promise.all(
             rooms.map(async (room) => {
                 const item = new ChatRoomDescriptionResponse(room);
-                const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id, idFromToken);
-
+                const chatParticipal = await this.chatParticipalModel
+                    .findOne({
+                        chatRoomId: room.id,
+                        userInformations: { $elemMatch: { userId: idFromToken, stillIn: true } },
+                    })
+                    .exec();
+                if(!chatParticipal){
+                    return
+                }
                 if (!room.isGroup) {
                     const userInformation = chatParticipal.userInformations.find(
                         (infor) => infor.userId !== idFromToken,
@@ -155,9 +163,15 @@ export class ChatRoomsService {
                 stillIn: true,
             }));
 
-            const res = await this.chatParticipalsService.addMember(chatRoomId, temp , idFromToken);
+            const res = await this.chatParticipalsService.addMember(chatRoomId, temp, idFromToken);
 
-            return res
+            return res;
+        }
+
+        if (type === ENUM_UPDATE_MEMBER_TYPE.REMOVE) {
+            const res = await this.chatParticipalsService.removeMember(chatRoomId, userIds[0], idFromToken);
+
+            return res;
         }
     }
 }
