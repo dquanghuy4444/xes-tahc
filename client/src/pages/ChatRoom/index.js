@@ -1,5 +1,6 @@
 import React from "react"
 
+import { ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
 import useFetchDataNoSave from "hooks/useFetchDataNoSave"
 import { useParams } from "react-router-dom"
 import { useStore } from "store"
@@ -15,20 +16,24 @@ const ChatRoom = () => {
     const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
     const setMessengers = useStore((state) => state.setMessengers)
 
-    useFetchDataNoSave(`/messengers/${id}`, setMessengers, [id])
+    useFetchDataNoSave(MessengerApiPath.messengersInRoom(id), setMessengers, [id])
 
-    useFetchDataNoSave(`/chat-rooms/${id}`, (res) => {
-        setChatRoomInfor({
-            ...res,
-            userInfors: [
-                ...res.userInfors,
-                {
-                    ...myInfor,
-                    isMe: true
-                }
-            ]
-        })
-    }, [id , myInfor])
+    useFetchDataNoSave(
+        ChatRoomApiPath.chatRoomDetail(id),
+        (res) => {
+            setChatRoomInfor({
+                ...res,
+                userInfors: [
+                    ...res.userInfors,
+                    {
+                        ...myInfor,
+                        isMe: true
+                    }
+                ]
+            })
+        },
+        [id, myInfor]
+    )
 
     return (
         <div className="h-full chat-room">

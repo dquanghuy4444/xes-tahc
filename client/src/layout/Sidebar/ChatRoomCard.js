@@ -1,3 +1,5 @@
+import { ENUM_MESSAGE_TYPE , ENUM_MESSAGE_INFO_TYPE } from "constants"
+
 import React from "react"
 
 import CircleIcon from "@mui/icons-material/Circle"
@@ -6,16 +8,16 @@ import moment from "moment"
 import { useNavigate } from "react-router-dom"
 
 const ChatRoomCard = ({ info }) => {
-    const { lastMessageInfor, avatar, name, id } = info
+    const { lastMessengerInfor, avatar, name, id } = info
 
     const navigate = useNavigate()
 
     const getTimePeriodToPresent = () => {
-        if (!lastMessageInfor){
+        if (!lastMessengerInfor){
             return <></>
         }
 
-        const { createdAt } = lastMessageInfor
+        const { createdAt } = lastMessengerInfor
         let str = moment(createdAt).fromNow()
         str = str.replace("minutes ago", "phút")
 
@@ -24,6 +26,25 @@ const ChatRoomCard = ({ info }) => {
 
     const handleRedirectToChatRoom = () => {
         navigate(`/room/${id}`, { replace: true })
+    }
+
+    const getContentLastMessenger = () => {
+        if (!lastMessengerInfor){
+            return "Chưa có tin nhắn nào"
+        }
+        if(lastMessengerInfor.type === ENUM_MESSAGE_TYPE.TEXT){
+            return `${lastMessengerInfor.userName} : ${lastMessengerInfor.content}`
+        }
+        if(lastMessengerInfor.type === ENUM_MESSAGE_TYPE.INFO){
+            if(lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
+                return `${lastMessengerInfor.userName} đã đổi tên nhóm`
+            }
+            if(lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER){
+                return `${lastMessengerInfor.userName} đã thêm thành viên`
+            }
+        }
+
+        return ""
     }
 
     return (
@@ -36,7 +57,7 @@ const ChatRoomCard = ({ info }) => {
             <div className="ml-4">
                 <p
                     className={ `${
-                        lastMessageInfor?.hasRead ? "text-quinary" : "font-semibold"
+                        lastMessengerInfor?.hasRead ? "text-quinary" : "font-semibold"
                     } text-overflow` }
                 >
                     { name }
@@ -45,19 +66,17 @@ const ChatRoomCard = ({ info }) => {
                 <div className="flex space-x-4 items-center">
                     <p
                         className={ `${
-                            lastMessageInfor?.hasRead ? "text-quinary" : "font-semibold"
+                            lastMessengerInfor?.hasRead ? "text-quinary" : "font-semibold"
                         } text-sm text-overflow max-w-[160px]` }
                     >
-                        { lastMessageInfor
-                            ? `${lastMessageInfor.userName} : ${lastMessageInfor.content}`
-                            : "Chưa có tin nhắn nào" }
+                        { getContentLastMessenger() }
                     </p>
 
                     { getTimePeriodToPresent() }
                 </div>
             </div>
 
-            { !lastMessageInfor?.hasRead && (
+            { !lastMessengerInfor?.hasRead && (
                 <div className="ml-auto">
                     <CircleIcon color="primary" sx={ { fontSize: 16 } } />
                 </div>

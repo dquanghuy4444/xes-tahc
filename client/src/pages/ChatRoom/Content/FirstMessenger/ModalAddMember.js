@@ -1,82 +1,169 @@
-import React, { useState } from "react"
+import { ENUM_UPDATE_MEMBER_TYPE, ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
 
-import Button from "@mui/material/Button"
-import Dialog from "@mui/material/Dialog"
-import DialogActions from "@mui/material/DialogActions"
-import DialogContent from "@mui/material/DialogContent"
-import DialogTitle from "@mui/material/DialogTitle"
-import TextField from "@mui/material/TextField"
-import { putData } from "helper"
-import useFetchData from "hooks/useFetchData"
-import { useParams } from "react-router-dom"
+import React, { useState, useEffect } from "react"
+
+import { Avatar, Button, Stack } from "@mui/material"
+import Checkbox from "@mui/material/Checkbox"
+import AvatarWithClose from "components/AvatarWithClose"
+import Modal from "components/Modal"
+import SearchInput from "components/SearchInput"
+import { UserApiPath, ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
+import { fetchData, putData, postData } from "helper"
 import { useStore } from "store"
 import { showNotification } from "utils"
 
-export default function ModalAddMember({ open, setOpen }){
-    const { id } = useParams()
-
+const ModalAddMember = ({ open, setOpen }) => {
     const roomInfor = useStore((state) => state.chatRoomInfor)
-    const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
-    const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
+    const setMessengers = useStore((state) => state.setMessengers)
 
+    const [search, setSearch] = useState("")
+    const [suggestUsers, setSuggestUsers] = useState([])
+    const [chooseUsers, setChooseUsers] = useState([])
 
-    useFetchData(
-        `users${
-            roomInfor?.userInfors.length > 0
-                ? `?remove_users=${roomInfor.userInfors.map((info) => info.id).join(",")}`
-                : ""
-        }` , null , [id]
-    )
+    useEffect(() => {
+        const getSuggestUsers = async() => {
+            if (!open) return
 
-    const [name, setName] = useState("")
+            const res = await fetchData(
+                UserApiPath.suggestUsers(roomInfor?.userInfors.filter((info) => info.stillIn).map((info) => info.id))
+            )
 
-    const handleClose = () => {
-        setOpen(false)
-    }
-
-    const handleChangeName = async() => {
-        if (!name){
-            return
+            setSuggestUsers(res)
         }
-        const res = await putData(`chat-rooms`, id, {
-            name
+
+        getSuggestUsers()
+    }, [open])
+
+    const handleAddMember = async() => {
+        if (chooseUsers.length === 0) return
+
+        const res = await putData(ChatRoomApiPath.addMember(roomInfor.id), {
+            type    : ENUM_UPDATE_MEMBER_TYPE.ADD,
+            userIds : chooseUsers.map((info) => info.id)
         })
 
         if (res){
-            setChatRoomDescriptions([
-                {
-                    name,
-                    id
-                }
-            ])
-            setChatRoomInfor({ name })
-            showNotification("success", "Bạn đã thay đổi tên thành công")
-            setName("")
-            handleClose()
+            const arrMess = []
+            await Promise.all(
+                chooseUsers.map(async(info) => {
+                    const mess = await postData(MessengerApiPath.index, {
+                        content : "",
+                        type    : ENUM_MESSAGE_TYPE.INFO,
+                        info    : {
+                            type   : ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER,
+                            victim : info.id
+                        },
+                        chatRoomId: roomInfor.id
+                    })
+                    arrMess.push({
+                        ...mess,
+                        info: {
+                            ...mess.info,
+                            userInfor: info
+                        }
+                    })
+                })
+            )
+
+            setMessengers(arrMess)
+            showNotification("success", "Bạn đã thêm thành viên thành công")
+            setOpen(false)
         }
     }
 
+    const showSuggestUsers = () => {
+        if (suggestUsers.length === 0) return <></>
+
+        return (
+            <div className="mt-2 max-h-[240px] overflow-auto">
+                { suggestUsers.map((info) => {
+                    const handleChooseUser = () => {
+                        if (chooseUsers.some((i) => i.id === info.id)){
+                            setChooseUsers((prev) => prev.filter((i) => i.id !== info.id))
+
+                            return
+                        }
+
+                        setChooseUsers((prev) => [...prev, info])
+                    }
+
+                    return (
+                        <Stack
+                            alignItems="center"
+                            className="cursor-pointer hover:bg-quinary--light p-2 rounded"
+                            direction="row"
+                            key={ info?.id }
+                            onClick={ handleChooseUser }
+                        >
+                            <Avatar src={ info?.avatar } />
+
+                            <p className="ml-4">{ info?.fullName }</p>
+
+                            <Checkbox
+                                checked={ chooseUsers.some((i) => i.id === info?.id) }
+                                sx={ { ml: "auto" } }
+                            />
+                        </Stack>
+                    )
+                }) }
+            </div>
+        )
+    }
+
+    const showChooseUsers = () => {
+        return (
+            <div className="h-[100px] flex items-center">
+                { chooseUsers.length === 0 && (
+                    <p className="text-center w-full text-quinary">Chưa chọn người nào</p>
+                ) }
+
+                { chooseUsers.map((info) => {
+                    const handleUnchecked = () => {
+                        setChooseUsers((prev) => prev.filter((i) => i.id !== info.id))
+                    }
+
+                    return (
+                        <AvatarWithClose
+                            close={ handleUnchecked }
+                            key={ info.id }
+                            src={ info.avatar }
+                            sx={ { width: 44, height: 44 } }
+                        />
+                    )
+                }) }
+            </div>
+        )
+    }
+
     return (
-        <Dialog open={ open } onClose={ handleClose }>
-            <DialogTitle>Thêm thành viên</DialogTitle>
+        <Modal close={ () => setOpen(false) } open={ open }>
+            <div className="w-[500px]">
+                <div className="relative py-4 border-b-2 border-border">
+                    <p className="text-center font-semibold text-xl">Thêm người</p>
+                </div>
 
-            <DialogContent sx={ { minWidth: 200 } }>
-                <TextField
-                    autoFocus
-                    fullWidth
-                    label="Tên nhóm"
-                    margin="dense"
-                    value={ name }
-                    variant="standard"
-                    onChange={ (e) => setName(e.target.value) }
-                />
-            </DialogContent>
+                <div className="p-4">
+                    <SearchInput value={ search } onChange={ (e) => setSearch(e.target.value) } />
 
-            <DialogActions>
-                <Button onClick={ handleClose }>Hủy</Button>
+                    { showChooseUsers() }
 
-                <Button onClick={ handleChangeName }>Lưu</Button>
-            </DialogActions>
-        </Dialog>
+                    <p>Gợi ý</p>
+
+                    <div className="max-h-[240px] overflow-auto">{ showSuggestUsers() }</div>
+
+                    <Button
+                        fullWidth
+                        disabled={ chooseUsers.length === 0 }
+                        sx={ { mt: 4 } }
+                        variant="contained"
+                        onClick={ handleAddMember }
+                    >
+                        Thêm người
+                    </Button>
+                </div>
+            </div>
+        </Modal>
     )
 }
+
+export default ModalAddMember

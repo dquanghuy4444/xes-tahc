@@ -21,9 +21,9 @@ const fetchData = async(path, payload) => {
     }
 }
 
-const putData = async(path, idItem, data) => {
+const putData = async(path, data) => {
     try {
-        const response = await axios.put(`${path}/${idItem}`, {
+        const response = await axios.put(path, {
             ...data
         })
 

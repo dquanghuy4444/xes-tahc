@@ -1,5 +1,6 @@
 import React, { useEffect, useState, Suspense } from "react"
 
+import {UserApiPath} from "configs/api-paths"
 import { fetchData } from "helper"
 import Layout from "layout"
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
@@ -51,7 +52,7 @@ const App = () => {
 
     useEffect(() => {
         const getAuthen = async() => {
-            const res = await fetchData("users/me")
+            const res = await fetchData(UserApiPath.myDetail)
 
             if (!res){
                 setIsAuthenticated(false)

@@ -5,6 +5,7 @@ import React, { useState } from "react"
 import InsertPhotoIcon from "@mui/icons-material/InsertPhoto"
 import SendIcon from "@mui/icons-material/Send"
 import TextField from "@mui/material/TextField"
+import { MessengerApiPath } from "configs/api-paths"
 import { postData } from "helper"
 import useEventListener from "hooks/useEventListener"
 import { useParams } from "react-router-dom"
@@ -15,7 +16,6 @@ const Input = () => {
 
     const setMessengers = useStore((state) => state.setMessengers)
 
-
     const [message, setMessage] = useState("")
     const [isFocus, setIsFocus] = useState(true)
 
@@ -23,14 +23,13 @@ const Input = () => {
         if (!message){
             return
         }
-        const mess = await postData("messengers", {
+        const mess = await postData(MessengerApiPath.index, {
             content    : message,
             type       : ENUM_MESSAGE_TYPE.TEXT,
             chatRoomId : id
         })
 
         setMessengers([mess])
-
 
         setMessage("")
     }

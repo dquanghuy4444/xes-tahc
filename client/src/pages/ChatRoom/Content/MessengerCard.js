@@ -6,7 +6,6 @@ import Box from "@mui/material/Box"
 import { blue, teal } from "@mui/material/colors"
 
 export default function MessengerCard({ userInfor, content, type, info }){
-
     const showContent = () => {
         if (type === ENUM_MESSAGE_TYPE.TEXT){
             return (
@@ -28,6 +27,9 @@ export default function MessengerCard({ userInfor, content, type, info }){
 
             if (info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
                 str += " đã đổi tên nhóm thành "
+            }
+            if (info.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER){
+                str += ` đã thêm ${info?.userInfor?.fullName}`
             }
 
             return (

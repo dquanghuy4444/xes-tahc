@@ -6,6 +6,7 @@ import CardActions from "@mui/material/CardActions"
 import CardContent from "@mui/material/CardContent"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
+import { AuthApiPath } from "configs/api-paths"
 import { postData } from "helper"
 import { useNavigate } from "react-router-dom"
 import { showNotification } from "utils"
@@ -27,7 +28,7 @@ export default function Login(){
 
             return
         }
-        const res = await postData("auth/register", {
+        const res = await postData(AuthApiPath.register, {
             username: userName,
             password,
             phoneNumber,
@@ -46,7 +47,7 @@ export default function Login(){
 
     const handleSignIn = async() => {
         if (isSignInPage){
-            const res = await postData("auth/login", {
+            const res = await postData(AuthApiPath.login, {
                 username: userName,
                 password
             })
