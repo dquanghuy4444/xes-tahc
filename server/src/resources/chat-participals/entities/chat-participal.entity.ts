@@ -4,6 +4,9 @@ import { Document } from 'mongoose';
 export interface IUserInformation {
     userId: string;
     lastTimeReading: any;
+    addedBy: string;
+    addedAt: any;
+    stillIn: boolean;
 }
 
 @Schema()

@@ -4,6 +4,8 @@ import {
     ChatRoomDescriptionResponse,
     ChatRoomDetailResponse,
     CreateRoomReq,
+    ENUM_UPDATE_MEMBER_TYPE,
+    UpdateMemberReq,
     UpdateRoomReq,
 } from './dto/chat-rooms.dto';
 import { Model, Types } from 'mongoose';
@@ -12,6 +14,7 @@ import { Messenger } from 'resources/messengers/entities/messenger.entity';
 import { ChatParticipalsService } from 'resources/chat-participals/chat-participals.service';
 import { IUserInformation } from 'resources/chat-participals/entities/chat-participal.entity';
 import { UsersService } from 'resources/users/users.service';
+import { info } from 'console';
 
 @Injectable()
 export class ChatRoomsService {
@@ -36,8 +39,9 @@ export class ChatRoomsService {
         const userInformations: IUserInformation[] = [idFromToken, ...userIds].map((userId) => ({
             userId,
             lastTimeReading: Date.now(),
-            addedBy:me.id,
-            stillIn:true
+            addedAt: Date.now(),
+            addedBy: me.id,
+            stillIn: true,
         }));
         await this.chatParticipalsService.create({
             chatRoomId: chatRoom.id,
@@ -54,17 +58,20 @@ export class ChatRoomsService {
             chatParticipal.userInformations.map(async (infor) => {
                 if (infor.userId !== idFromToken) {
                     const userInfor = await this.usersService.getDetail(infor.userId);
-                    userInfors.push(userInfor);
+                    userInfors.push({
+                        ...infor,
+                        ...userInfor
+                    });
                 }
             }),
         );
 
         const room = await this.chatRoomModel.findById(chatRoomId).exec(); // findById
 
-        const result = new ChatRoomDetailResponse(room, userInfors)
-        if(!result.isGroup){
-            result.name = userInfors[0].fullName
-            result.avatar = userInfors[0].avatar
+        const result = new ChatRoomDetailResponse(room, userInfors);
+        if (!result.isGroup) {
+            result.name = userInfors[0].fullName;
+            result.avatar = userInfors[0].avatar;
         }
         return result;
     }
@@ -80,10 +87,10 @@ export class ChatRoomsService {
                 const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(room.id, idFromToken);
 
                 if (!room.isGroup) {
-                    const userInformations = chatParticipal.userInformations.find(
+                    const userInformation = chatParticipal.userInformations.find(
                         (infor) => infor.userId !== idFromToken,
                     );
-                    const userInfor = await this.usersService.getDetail(userInformations.userId);
+                    const userInfor = await this.usersService.getDetail(userInformation.userId);
 
                     item.name = userInfor.fullName;
                     item.avatar = userInfor.avatar;
@@ -92,24 +99,26 @@ export class ChatRoomsService {
                 const myInfor = chatParticipal.userInformations.find((infor) => infor.userId === idFromToken);
                 const { lastTimeReading } = myInfor;
 
-                const lastMessage = await this.messengerModel
+                const lastMessenger = await this.messengerModel
                     .findOne({ chatRoomId: room.id })
                     .sort({ createdAt: -1 })
                     .exec();
 
-                if (lastMessage) {
+                if (lastMessenger) {
                     let userName = 'Bạn';
 
-                    if (room.isGroup && lastMessage.createdBy !== idFromToken) {
-                        const userInfor = await this.usersService.getDetail(lastMessage.createdBy);
+                    if (room.isGroup && lastMessenger.createdBy !== idFromToken) {
+                        const userInfor = await this.usersService.getDetail(lastMessenger.createdBy);
 
                         userName = userInfor.fullName;
                     }
-                    item.lastMessageInfor = {
-                        createdAt: lastMessage.createdAt,
-                        content: lastMessage.content,
+                    item.lastMessengerInfor = {
+                        createdAt: lastMessenger.createdAt,
+                        content: lastMessenger.content,
+                        type: lastMessenger.type,
+                        info: lastMessenger.info,
                         userName,
-                        hasRead: new Date(lastMessage.createdAt).getTime() <= new Date(lastTimeReading).getTime(),
+                        hasRead: new Date(lastMessenger.createdAt).getTime() <= new Date(lastTimeReading).getTime(),
                     };
                 }
 
@@ -132,5 +141,23 @@ export class ChatRoomsService {
         });
 
         return room;
+    }
+
+    async updateMember(chatRoomId: string, updateMemberReq: UpdateMemberReq, idFromToken: string) {
+        const { type, userIds } = updateMemberReq;
+
+        if (type === ENUM_UPDATE_MEMBER_TYPE.ADD) {
+            const temp: IUserInformation[] = userIds.map((userId) => ({
+                userId,
+                lastTimeReading: Date.now(),
+                addedBy: idFromToken,
+                addedAt: Date.now(),
+                stillIn: true,
+            }));
+
+            const res = await this.chatParticipalsService.addMember(chatRoomId, temp , idFromToken);
+
+            return res
+        }
     }
 }

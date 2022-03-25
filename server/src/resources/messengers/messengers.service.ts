@@ -37,7 +37,7 @@ export class MessengersService {
             ...doc,
             createdBy: idFromToken,
         });
-        return result;
+        return new MessengerResponse(result);
     }
 
     async get(chatRoomId: string, idFromToken: string) {
