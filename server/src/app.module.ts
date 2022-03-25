@@ -15,7 +15,6 @@ import { ChatRoomsModule } from 'resources/chat-rooms/chat-rooms.module';
 import { MessengersModule } from 'resources/messengers/messengers.module';
 import { ChatCalendarsModule } from 'resources/chat-calendars/chat-calendars.module';
 
-import { ChatSocketModule } from 'events/chat-socket/chat-socket.module';
 import { ChatScheduleModule } from 'events/chat-schedule/chat-schedule.module';
 
 import redisStore from 'cache-manager-ioredis';
@@ -41,7 +40,6 @@ mongoose.set('debug', true);
         ChatRoomsModule,
         MessengersModule,
 
-        ChatSocketModule,
 
         // ChatScheduleModule,
 

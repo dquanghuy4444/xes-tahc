@@ -10,7 +10,6 @@ import { contentParser } from 'fastify-multer';
 import secureSession from 'fastify-secure-session';
 import { fastifyHelmet } from 'fastify-helmet';
 import { ValidationPipe } from '@nestjs/common';
-import { WsAdapter } from '@nestjs/platform-ws';
 
 async function bootstrap() {
     const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
@@ -37,7 +36,6 @@ async function bootstrap() {
     await app.register(fastifyHelmet);
     await app.register(contentParser);
 
-    app.useWebSocketAdapter(new WsAdapter(app));
 
     await app.listen(getEnv(ENUM_ENVIRONMENT_VARIABLE.PORT));
 }
