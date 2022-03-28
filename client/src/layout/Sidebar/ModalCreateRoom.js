@@ -6,6 +6,7 @@ import TextField from "@mui/material/TextField"
 import AvatarWithClose from "components/AvatarWithClose"
 import Modal from "components/Modal"
 import SearchInput from "components/SearchInput"
+import { SOCKET_EVENT_NAMES } from "configs"
 import { UserApiPath, ChatRoomApiPath } from "configs/api-paths"
 import { fetchData, postData } from "helper"
 import { useNavigate } from "react-router-dom"
@@ -14,7 +15,7 @@ import { showNotification } from "utils"
 
 const ModalCreateRoom = ({ open, setOpen }) => {
     const myInfor = useStore((state) => state.myInfor)
-    const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
+    const socket = useStore((state) => state.socket)
 
     const navigate = useNavigate()
 
@@ -45,15 +46,10 @@ const ModalCreateRoom = ({ open, setOpen }) => {
         })
 
         if (res){
+            socket.emit(SOCKET_EVENT_NAMES.CLIENT.CREATE_ROOM, res)
             setName("")
             setChooseUsers([])
             setSearch("")
-            setChatRoomDescriptions([
-                {
-                    ...res,
-                    lastMessengerInfor: null
-                }
-            ])
             showNotification("success", "Bạn đã tạo phòng thành công")
             setOpen(false)
             navigate(`/room/${res.id}`, { replace: true })

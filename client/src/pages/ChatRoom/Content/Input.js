@@ -5,6 +5,7 @@ import React, { useState } from "react"
 import InsertPhotoIcon from "@mui/icons-material/InsertPhoto"
 import SendIcon from "@mui/icons-material/Send"
 import TextField from "@mui/material/TextField"
+import { SOCKET_EVENT_NAMES } from "configs"
 import { MessengerApiPath } from "configs/api-paths"
 import { postData } from "helper"
 import useEventListener from "hooks/useEventListener"
@@ -14,7 +15,7 @@ import { useStore } from "store"
 const Input = () => {
     const { id } = useParams()
 
-    const setMessengers = useStore((state) => state.setMessengers)
+    const socket = useStore((state) => state.socket)
 
     const [message, setMessage] = useState("")
     const [isFocus, setIsFocus] = useState(true)
@@ -29,9 +30,13 @@ const Input = () => {
             chatRoomId : id
         })
 
-        setMessengers([mess])
+        if(mess){
+            socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, mess)
 
-        setMessage("")
+            setMessage("")
+        }
+
+
     }
 
     useEventListener("keypress", (e) => {

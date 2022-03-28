@@ -4,8 +4,10 @@ import AddIcon from "@mui/icons-material/Add"
 import Avatar from "@mui/material/Avatar"
 import { blue } from "@mui/material/colors"
 import SearchInput from "components/SearchInput"
+import { SOCKET_EVENT_NAMES } from "configs"
 import { ChatRoomApiPath } from "configs/api-paths"
 import useFetchDataNoSave from "hooks/useFetchDataNoSave"
+import useSocketOn from "hooks/useSocketOn"
 import { useParams } from "react-router-dom"
 import { useStore } from "store"
 
@@ -42,6 +44,10 @@ const Sidebar = () => {
         },
         []
     )
+
+    useSocketOn(SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION , (data) => {
+        setChatRoomDescriptions([data])
+    })
 
     return (
         <>
