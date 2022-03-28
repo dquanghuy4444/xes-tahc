@@ -44,11 +44,16 @@ export class ChatRoomsService {
             addedBy: me.id,
             stillIn: true,
         }));
-        await this.chatParticipalsService.create({
+
+        const chatParticipals = await this.chatParticipalsService.create({
             chatRoomId: chatRoom.id,
             userInformations,
         });
-        return new ChatRoomResponse(chatRoom);
+
+        return new ChatRoomResponse(
+            chatRoom,
+            chatParticipals.userInformations.map((ui) => ui.userId),
+        );
     }
 
     async getDetail(chatRoomId: string, idFromToken: string) {
@@ -91,8 +96,8 @@ export class ChatRoomsService {
                         userInformations: { $elemMatch: { userId: idFromToken, stillIn: true } },
                     })
                     .exec();
-                if(!chatParticipal){
-                    return
+                if (!chatParticipal) {
+                    return;
                 }
                 if (!room.isGroup) {
                     const userInformation = chatParticipal.userInformations.find(

@@ -60,14 +60,16 @@ export class ChatRoomResponse {
     avatar: string;
     createdBy: string;
     createdAt: Date;
+    userIds: string[];
 
-    constructor(chatRoom: ChatRoom) {
+    constructor(chatRoom: ChatRoom , userIds: string[] = []) {
         this.id = chatRoom.id;
         this.name = chatRoom.name;
         this.avatar = chatRoom.avatar;
         this.isGroup = chatRoom.isGroup;
         this.createdBy = chatRoom.createdBy;
         this.createdAt = chatRoom.createdAt;
+        this.userIds = userIds;
     }
 }
 export class ChatRoomDescriptionResponse extends ChatRoomResponse{

@@ -9,7 +9,9 @@ export class ChatParticipalsService {
     constructor(@InjectModel(ChatParticipal.name) private chatParticipalModel: Model<ChatParticipal>) {}
 
     async create(createChatParticipalReq: CreateChatParticipalReq) {
-        await this.chatParticipalModel.create(createChatParticipalReq);
+        const chatParticipals =  await this.chatParticipalModel.create(createChatParticipalReq);
+
+        return chatParticipals
     }
 
     async getDetailByChatRoomId(chatRoomId: string, userId: string) {
