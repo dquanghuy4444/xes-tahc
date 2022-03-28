@@ -1,4 +1,4 @@
-import { ENUM_MESSAGE_INFO_TYPE, ENUM_MESSAGE_TYPE } from "../constants";
+import { ENUM_MESSAGE_INFO_TYPE, ENUM_MESSAGE_TYPE } from '../constants';
 
 export interface IUser {
 	id: string;
@@ -25,28 +25,40 @@ export interface ICreateRoomReq {
 	userIds: string[];
 }
 
-
 export class MessageInfo {
-    type: ENUM_MESSAGE_INFO_TYPE;
+	type: ENUM_MESSAGE_INFO_TYPE;
 
-    victim?: string;
+	victim?: string;
 }
 
 export class MessageAttachment {
-    name: string;
+	name: string;
 
-    path: string;
+	path: string;
+}
+
+export class IUserInfor {
+	id: string;
+
+	fullName: string;
+
+	avatar: string;
+
+	phoneNumber: string;
+
+	email: string;
 }
 
 export interface ISendMessReq {
-    id: string;
-    type: ENUM_MESSAGE_TYPE;
-    chatRoomId: string;
-    createdBy: string;
-    content?: string;
-    attachment?: MessageAttachment;
-    info?: MessageInfo;
-    createdAt: Date;
-    userIds: string[];
+    chatRoomName: string;
+	id: string;
+	type: ENUM_MESSAGE_TYPE;
+	chatRoomId: string;
+	createdBy: string;
+	content?: string;
+	attachment?: MessageAttachment;
+	info?: MessageInfo;
+	createdAt: Date;
+	userIds: string[];
+	userInfor: IUserInfor;
 }
-

@@ -83,7 +83,7 @@ io.on('connection', (socket) => {
 			}
 
 			data.userIds.forEach((userId: string) => {
-				const user = getUser(userId);
+				const user: IUser = getUser(userId);
 				if (user) {
 					io.to(user.socketId).emit(
 						SOCKET_EVENT_NAMES.SERVER_SOCKET
@@ -97,7 +97,12 @@ io.on('connection', (socket) => {
 								info       : data?.info,
 								createdAt  : data?.createdAt,
 								createdBy  : data?.createdBy,
+								userName   :
+									user.id === data?.createdBy
+										? 'Bạn'
+										: data.userInfor.fullName,
 							},
+                            name: data.chatRoomName
 						},
 					);
 				}
