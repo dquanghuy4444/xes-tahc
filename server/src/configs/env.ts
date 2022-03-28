@@ -1,4 +1,5 @@
 export enum ENUM_ENVIRONMENT_VARIABLE {
+    NODE_ENV = 'NODE_ENV',
     PORT = 'PORT',
     MONGODB_URL_CONNECT = 'MONGODB_URL_CONNECT',
     SECRET_OR_PUBLIC_KEY = 'SECRET_OR_PUBLIC_KEY',
@@ -14,6 +15,9 @@ export enum ENUM_ENVIRONMENT_VARIABLE {
 export const getEnv = (env: string): any => {
     if (env === ENUM_ENVIRONMENT_VARIABLE.SECRET_OR_PUBLIC_KEY) {
         return process.env[ENUM_ENVIRONMENT_VARIABLE.SECRET_OR_PUBLIC_KEY] || 'HEHE';
+    }
+    if (env === ENUM_ENVIRONMENT_VARIABLE.NODE_ENV) {
+        return process.env[ENUM_ENVIRONMENT_VARIABLE.NODE_ENV] || 'HEHE';
     }
     if (env === ENUM_ENVIRONMENT_VARIABLE.PORT) {
         return process.env[ENUM_ENVIRONMENT_VARIABLE.PORT] || 3000;

@@ -12,7 +12,10 @@ import { fastifyHelmet } from 'fastify-helmet';
 import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
-    const app = await NestFactory.create<NestFastifyApplication>(AppModule, new FastifyAdapter());
+    const app = await NestFactory.create<NestFastifyApplication>(
+        AppModule,
+        new FastifyAdapter({ logger: getEnv(ENUM_ENVIRONMENT_VARIABLE.NODE_ENV) === 'dev' }),
+    );
     app.setGlobalPrefix('v1');
 
     const config = new DocumentBuilder().setTitle('NestJS Auth').setDescription('').setVersion('1.0').build();
@@ -35,7 +38,6 @@ async function bootstrap() {
     await app.register(fastifyCsrf);
     await app.register(fastifyHelmet);
     await app.register(contentParser);
-
 
     await app.listen(getEnv(ENUM_ENVIRONMENT_VARIABLE.PORT));
 }

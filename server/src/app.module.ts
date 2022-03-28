@@ -21,11 +21,12 @@ import redisStore from 'cache-manager-ioredis';
 import { HttpCacheInterceptor } from 'interceptors/http-cache.interceptor';
 import { ChatParticipalsModule } from './resources/chat-participals/chat-participals.module';
 
-mongoose.set('debug', true);
+mongoose.set('debug', getEnv(ENUM_ENVIRONMENT_VARIABLE.NODE_ENV) === "dev");
 
 @Module({
     imports: [
         ConfigModule.forRoot({
+            envFilePath: `${process.cwd()}/.env.${getEnv(ENUM_ENVIRONMENT_VARIABLE.NODE_ENV)}`,
             isGlobal: true,
         }),
         MongooseModule.forRoot(getEnv(ENUM_ENVIRONMENT_VARIABLE.MONGODB_URL_CONNECT), {
@@ -39,7 +40,6 @@ mongoose.set('debug', true);
         UsersModule,
         ChatRoomsModule,
         MessengersModule,
-
 
         // ChatScheduleModule,
 
