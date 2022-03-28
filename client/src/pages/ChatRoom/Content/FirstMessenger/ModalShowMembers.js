@@ -17,7 +17,7 @@ import { showNotification } from "utils"
 const ModalShowMembers = ({ open, setOpen }) => {
     const navigate = useNavigate()
 
-    const roomInfor = useStore((state) => state.chatRoomInfor)
+    const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
     const setMessengers = useStore((state) => state.setMessengers)
 
@@ -25,7 +25,7 @@ const ModalShowMembers = ({ open, setOpen }) => {
     const [removeUserInfor, setRemoveUserInfor] = useState("")
 
     const handleRemoveUser = async() => {
-        const res = await putData(ChatRoomApiPath.member(roomInfor.id), {
+        const res = await putData(ChatRoomApiPath.member(chatRoomInfor.id), {
             type    : ENUM_UPDATE_MEMBER_TYPE.REMOVE,
             userIds : [removeUserInfor.userId]
         })
@@ -40,11 +40,11 @@ const ModalShowMembers = ({ open, setOpen }) => {
     }
 
     const showMembers = () => {
-        if (roomInfor.userInfors.length === 0) return <></>
+        if (chatRoomInfor.userInfors.length === 0) return <></>
 
         return (
             <div className="max-h-[240px] overflow-auto">
-                { roomInfor.userInfors
+                { chatRoomInfor.userInfors
                     .filter((info) => info.stillIn)
                     .map((info) => {
                         return (

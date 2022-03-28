@@ -2,21 +2,22 @@ import { ENUM_UPDATE_MEMBER_TYPE, ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } fr
 
 import React, { useState, useEffect } from "react"
 
+
 import { Avatar, Button, Stack } from "@mui/material"
 import Checkbox from "@mui/material/Checkbox"
 import AvatarWithClose from "components/AvatarWithClose"
 import Modal from "components/Modal"
 import SearchInput from "components/SearchInput"
+import { SOCKET_EVENT_NAMES } from "configs"
 import { UserApiPath, ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
 import { fetchData, putData, postData } from "helper"
 import { useStore } from "store"
 import { showNotification } from "utils"
 
 const ModalAddMember = ({ open, setOpen }) => {
-    const roomInfor = useStore((state) => state.chatRoomInfor)
-    const setMessengers = useStore((state) => state.setMessengers)
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
-    const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
+    const myInfor = useStore((state) => state.myInfor)
+    const socket = useStore((state) => state.socket)
 
     const [search, setSearch] = useState("")
     const [suggestUsers, setSuggestUsers] = useState([])
@@ -28,7 +29,7 @@ const ModalAddMember = ({ open, setOpen }) => {
 
             const res = await fetchData(
                 UserApiPath.suggestUsers(
-                    roomInfor?.userInfors.filter((info) => info.stillIn).map((info) => info.id)
+                    chatRoomInfor?.userInfors.filter((info) => info.stillIn).map((info) => info.id)
                 )
             )
 
@@ -41,7 +42,7 @@ const ModalAddMember = ({ open, setOpen }) => {
     const handleAddMember = async() => {
         if (chooseUsers.length === 0) return
 
-        const res = await putData(ChatRoomApiPath.member(roomInfor.id), {
+        const res = await putData(ChatRoomApiPath.member(chatRoomInfor.id), {
             type    : ENUM_UPDATE_MEMBER_TYPE.ADD,
             userIds : chooseUsers.map((info) => info.id)
         })
@@ -49,7 +50,6 @@ const ModalAddMember = ({ open, setOpen }) => {
         if (res){
             setChooseUsers([])
             setSearch("")
-            const arrMess = []
             await Promise.all(
                 chooseUsers.map(async(info) => {
                     const mess = await postData(MessengerApiPath.index, {
@@ -59,21 +59,17 @@ const ModalAddMember = ({ open, setOpen }) => {
                             type   : ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER,
                             victim : info.id
                         },
-                        chatRoomId: roomInfor.id
+                        chatRoomId: chatRoomInfor.id
                     })
-                    arrMess.push(mess)
+                    socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+                        ...mess,
+                        userIds      : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
+                        userInfor    : myInfor,
+                        chatRoomName : chatRoomInfor.name
+                    })
                 })
             )
 
-            // setChatRoomInfor({
-            //     ...chatRoomInfor,
-            //     userInfors: {
-            //         ...chatRoomInfor.userInfors,
-            //         ...chooseUsers
-            //     }
-            // })
-
-            setMessengers(arrMess)
             showNotification("success", "Bạn đã thêm thành viên thành công")
             setOpen(false)
         }

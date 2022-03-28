@@ -2,12 +2,14 @@ import { ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
 
 import React, { useState } from "react"
 
+
 import Button from "@mui/material/Button"
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
 import DialogTitle from "@mui/material/DialogTitle"
 import TextField from "@mui/material/TextField"
+import { SOCKET_EVENT_NAMES } from "configs"
 import { ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
 import { putData, postData } from "helper"
 import { useParams } from "react-router-dom"
@@ -17,9 +19,9 @@ import { showNotification } from "utils"
 export default function ModalChangeName({ open, setOpen }){
     const { id } = useParams()
 
-    const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
-    const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
-    const setMessengers = useStore((state) => state.setMessengers)
+    const chatRoomInfor = useStore((state) => state.chatRoomInfor)
+    const myInfor = useStore((state) => state.myInfor)
+    const socket = useStore((state) => state.socket)
 
     const [name, setName] = useState("")
 
@@ -48,18 +50,19 @@ export default function ModalChangeName({ open, setOpen }){
             chatRoomId: id
         })
 
-        setMessengers([mess])
 
-        setChatRoomDescriptions([
-            {
-                name,
-                id
-            }
-        ])
-        setChatRoomInfor({ name })
-        showNotification("success", "Bạn đã thay đổi tên thành công")
-        setName("")
-        handleClose()
+        if (mess){
+            socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+                ...mess,
+                userIds      : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
+                userInfor    : myInfor,
+                chatRoomName : name
+            })
+
+            showNotification("success", "Bạn đã thay đổi tên thành công")
+            setName("")
+            handleClose()
+        }
     }
 
     return (

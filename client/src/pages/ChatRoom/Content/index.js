@@ -1,6 +1,5 @@
-import React, { useMemo, useRef } from "react"
+import React, { useMemo, useRef , useEffect } from "react"
 
-import { info } from "autoprefixer"
 import { useStore } from "store"
 
 import FirstMessenger from "./FirstMessenger"
@@ -18,6 +17,10 @@ const Content = () => {
             endMessengerRef.current.scrollIntoView({ behavior: "smooth" })
         }
     }
+
+    useEffect(() => {
+        scrollToBottom()
+    } , [messengers])
 
     const messengersWithUserInfor = useMemo(() => {
         const userInfors = roomInfor?.userInfors || []

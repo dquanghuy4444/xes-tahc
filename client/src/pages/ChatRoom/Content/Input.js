@@ -16,6 +16,8 @@ const Input = () => {
     const { id } = useParams()
 
     const socket = useStore((state) => state.socket)
+    const chatRoomInfor = useStore((state) => state.chatRoomInfor)
+    const myInfor = useStore((state) => state.myInfor)
 
     const [message, setMessage] = useState("")
     const [isFocus, setIsFocus] = useState(true)
@@ -30,13 +32,18 @@ const Input = () => {
             chatRoomId : id
         })
 
-        if(mess){
-            socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, mess)
+        if (mess){
+            socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+                ...mess,
+                userIds: chatRoomInfor.userInfors
+                    .filter((info) => info.stillIn)
+                    .map((info) => info.id),
+                userInfor    : myInfor,
+                chatRoomName : chatRoomInfor.name
+            })
 
             setMessage("")
         }
-
-
     }
 
     useEventListener("keypress", (e) => {
