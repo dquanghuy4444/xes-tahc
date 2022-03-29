@@ -1,10 +1,14 @@
-import { ENUM_UPDATE_MEMBER_TYPE, ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
+import {
+    ENUM_UPDATE_MEMBER_TYPE,
+    ENUM_MESSAGE_TYPE,
+    ENUM_MESSAGE_INFO_TYPE,
+    ENUM_STATUS_SET_STATE_ZUSTAND
+} from "constants"
 
 import React, { useState } from "react"
 
 import LogoutIcon from "@mui/icons-material/Logout"
 import { Avatar, Stack } from "@mui/material"
-import Checkbox from "@mui/material/Checkbox"
 import { blue } from "@mui/material/colors"
 import ConfirmModal from "components/ConfirmModal"
 import Modal from "components/Modal"
@@ -18,6 +22,7 @@ const ModalShowMembers = ({ open, setOpen }) => {
     const navigate = useNavigate()
 
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
+    const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
     const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
     const setMessengers = useStore((state) => state.setMessengers)
 
@@ -30,11 +35,21 @@ const ModalShowMembers = ({ open, setOpen }) => {
             userIds : [removeUserInfor.userId]
         })
 
-        if(!res){
+        if (!res){
             return
         }
 
-        if(removeUserInfor?.isMe){
+        if (removeUserInfor?.isMe){
+            setChatRoomDescriptions(
+                [
+                    {
+                        id: chatRoomInfor.id
+                    }
+                ],
+                ENUM_STATUS_SET_STATE_ZUSTAND.REMOVE
+            )
+            showNotification("success", `Bạn đã thoát khỏi nhóm ${chatRoomInfor.name}`)
+
             navigate(`/`, { replace: true })
         }
     }

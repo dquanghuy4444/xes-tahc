@@ -14,17 +14,17 @@ import ModalChangeName from "./ModalChangeName"
 import ModalShowMembers from "./ModalShowMembers"
 
 export default function FirstMessenger(){
-    const roomInfor = useStore((state) => state.chatRoomInfor)
+    const chatRoomInfor = useStore((state) => state.chatRoomInfor)
 
     const [openModalChangeName, setOpenModalChangeName] = useState(false)
     const [openModalAddMem, setOpenModalAddMem] = useState(false)
     const [openModalShowMembers, setOpenModalShowMembers] = useState(false)
 
-    if (!roomInfor){
+    if (!chatRoomInfor){
         return <></>
     }
 
-    const { avatar, userInfors, createdBy, isGroup, createdAt, name } = roomInfor
+    const { avatar, userInfors, createdBy, isGroup, createdAt, name } = chatRoomInfor
 
     const showInforGroup = () => {
         if (!isGroup){

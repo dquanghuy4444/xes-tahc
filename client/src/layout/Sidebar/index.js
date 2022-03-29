@@ -22,6 +22,7 @@ const Sidebar = () => {
     const [search, setSearch] = useState("")
     const [openModalCreateRoom, setOpenModalCreateRoom] = useState(false)
 
+    const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
     const chatRoomDescriptions = useStore((state) => state.chatRoomDescriptions)
     const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
@@ -50,14 +51,6 @@ const Sidebar = () => {
 
     useSocketOn(SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION, (data) => {
         setChatRoomDescriptions([data])
-
-        if (data?.lastMessengerInfor.type !== ENUM_MESSAGE_TYPE.INFO){
-            return
-        }
-
-        if (data.lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
-            setChatRoomInfor({ name: data.name })
-        }
     })
 
     return (

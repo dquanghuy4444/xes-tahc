@@ -7,11 +7,13 @@ import { useStore } from "store"
 
 import Content from "./Content"
 import Header from "./Header"
+import InformationBar from "./InformationBar"
 import Sidebar from "./Sidebar"
 
 import "./index.css"
 
 const Index = ({ children }) => {
+    const isInforBarDisplayed = useStore((state) => state.isInforBarDisplayed)
     const socket = useStore((state) => state.socket)
     const myInfor = useStore((state) => state.myInfor)
     const setSocket = useStore((state) => state.setSocket)
@@ -36,10 +38,12 @@ const Index = ({ children }) => {
         <div className="h-screen flex flex-col bg-white">
             <Header />
 
-            <main className="flex main-layout">
+            <main className="flex main-layout max-w-screen">
                 <Sidebar />
 
                 <Content>{ children }</Content>
+
+                { isInforBarDisplayed && <InformationBar /> }
             </main>
         </div>
     )

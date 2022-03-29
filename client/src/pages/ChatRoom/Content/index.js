@@ -1,4 +1,4 @@
-import React, { useMemo, useRef , useEffect } from "react"
+import React, { useMemo, useRef, useEffect } from "react"
 
 import { useStore } from "store"
 
@@ -20,7 +20,7 @@ const Content = () => {
 
     useEffect(() => {
         scrollToBottom()
-    } , [messengers])
+    }, [messengers])
 
     const messengersWithUserInfor = useMemo(() => {
         const userInfors = roomInfor?.userInfors || []

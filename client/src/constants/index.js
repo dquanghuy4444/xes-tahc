@@ -17,3 +17,9 @@ export const ENUM_UPDATE_MEMBER_TYPE = {
     ADD    : 'ADD',
     REMOVE : 'REMOVE'
 }
+
+export const ENUM_STATUS_SET_STATE_ZUSTAND = {
+    REMOVE  : "REMOVE",
+    ADD_NEW : "ADD_NEW",
+    ADD     : "ADD"
+}

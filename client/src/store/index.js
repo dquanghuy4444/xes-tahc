@@ -1,7 +1,10 @@
+import { ENUM_STATUS_SET_STATE_ZUSTAND } from "constants"
+
 import create from "zustand"
 import { combine } from "zustand/middleware"
 
 const initialState = {
+    isInforBarDisplayed  : false,
     socket               : null,
     myInfor              : null,
     chatRoomInfor        : null,
@@ -11,6 +14,11 @@ const initialState = {
 
 const mutations = (set, get) => {
     return {
+        setIsInforBarDisplayed: () =>
+            set((state) => ({
+                ...state,
+                isInforBarDisplayed: !state.isInforBarDisplayed
+            })),
         setSocket: (newSocket) =>
             set((state) => ({
                 ...state,
@@ -38,17 +46,33 @@ const mutations = (set, get) => {
                 }
             }))
         },
-        setMessengers: (newMess) =>
-            set((state) => ({
-                ...state,
-                messengers: newMess.length === 0 ? [] : [...state.messengers, ...newMess]
-            })),
-        setNewMessengers: (newMess) =>
-            set((state) => ({
-                ...state,
-                messengers: newMess
-            })),
-        setChatRoomDescriptions: (newDesc) =>
+        setMessengers: (newMess, status = ENUM_STATUS_SET_STATE_ZUSTAND.ADD) => {
+            if (status === ENUM_STATUS_SET_STATE_ZUSTAND.ADD){
+                set((state) => ({
+                    ...state,
+                    messengers: [...state.messengers, ...newMess]
+                }))
+            } else if (status === ENUM_STATUS_SET_STATE_ZUSTAND.ADD_NEW){
+                set((state) => ({
+                    ...state,
+                    messengers: newMess
+                }))
+            }
+        },
+        setChatRoomDescriptions: (newDesc, status = ENUM_STATUS_SET_STATE_ZUSTAND.ADD) => {
+            if (status === ENUM_STATUS_SET_STATE_ZUSTAND.REMOVE){
+                const temp = [...get().chatRoomDescriptions]
+                temp.splice(
+                    temp.findIndex((desc) => desc.id === newDesc[0].id),
+                    1
+                )
+                set((state) => ({
+                    ...state,
+                    chatRoomDescriptions: temp
+                }))
+
+                return
+            }
             set((state) => {
                 if (newDesc.length === 1){
                     if (state.chatRoomDescriptions.some((desc) => desc.id === newDesc[0].id)){
@@ -73,6 +97,7 @@ const mutations = (set, get) => {
                     chatRoomDescriptions: [...newDesc, ...state.chatRoomDescriptions]
                 }
             })
+        }
     }
 }
 

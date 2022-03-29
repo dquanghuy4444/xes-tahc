@@ -1,3 +1,5 @@
+import { ENUM_STATUS_SET_STATE_ZUSTAND } from "constants"
+
 import React, { useEffect } from "react"
 
 import ChatIcon from "@mui/icons-material/Chat"
@@ -19,18 +21,20 @@ const ChatRoom = () => {
     const myInfor = useStore((state) => state.myInfor)
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
-    const setNewMessengers = useStore((state) => state.setNewMessengers)
     const setMessengers = useStore((state) => state.setMessengers)
 
-    useFetchDataNoSave(MessengerApiPath.messengersInRoom(id), setNewMessengers, [id])
+    useFetchDataNoSave(
+        MessengerApiPath.messengersInRoom(id),
+        (response) => {
+            setMessengers(response, ENUM_STATUS_SET_STATE_ZUSTAND.ADD_NEW)
+        },
+        [id]
+    )
 
     useFetchDataNoSave(
         ChatRoomApiPath.chatRoomDetail(id),
         (res) => {
-
             if (!res || !myInfor){
-                setChatRoomInfor(null)
-
                 return
             }
             setChatRoomInfor({
@@ -64,7 +68,7 @@ const ChatRoom = () => {
     })
 
     return (
-        <div className="h-full chat-room">
+        <div className="chat-room">
             { chatRoomInfor ? (
                 <>
                     <Header />
