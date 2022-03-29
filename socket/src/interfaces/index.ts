@@ -49,11 +49,18 @@ export class IUserInfor {
 	email: string;
 }
 
+export class IChatRoom {
+    name: string;
+
+    id: string;
+
+    avatar: string;
+}
+
 export interface ISendMessReq {
-    chatRoomName: string;
+    chatRoom: IChatRoom;
 	id: string;
 	type: ENUM_MESSAGE_TYPE;
-	chatRoomId: string;
 	createdBy: string;
 	content?: string;
 	attachment?: MessageAttachment;

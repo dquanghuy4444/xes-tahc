@@ -69,7 +69,7 @@ io.on('connection', (socket) => {
 	socket.on(
 		SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER,
 		(data: ISendMessReq) => {
-			const users: IUser[] = getUsersInRoom(data.chatRoomId);
+			const users: IUser[] = getUsersInRoom(data.chatRoom.id);
 			if (users?.length > 0) {
 				users.forEach((user: IUser) => {
 					if (user?.socketId) {
@@ -89,7 +89,7 @@ io.on('connection', (socket) => {
 						SOCKET_EVENT_NAMES.SERVER_SOCKET
 							.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION,
 						{
-							id                 : data.chatRoomId,
+							id                 : data.chatRoom.id,
 							lastMessengerInfor : {
 								type       : data.type,
 								content    : data.content,
@@ -102,7 +102,8 @@ io.on('connection', (socket) => {
 										? 'Bạn'
 										: data.userInfor.fullName,
 							},
-                            name: data.chatRoomName
+                            name   : data.chatRoom.name,
+                            avatar : data.chatRoom.avatar,
 						},
 					);
 				}
