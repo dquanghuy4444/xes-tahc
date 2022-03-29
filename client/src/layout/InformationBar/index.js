@@ -1,26 +1,21 @@
-import {
-    ENUM_UPDATE_MEMBER_TYPE,
-    ENUM_MESSAGE_TYPE,
-    ENUM_MESSAGE_INFO_TYPE,
-    ENUM_STATUS_SET_STATE_ZUSTAND
-} from "constants"
+import { ENUM_UPDATE_MEMBER_TYPE, ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
 
 import React, { useState } from "react"
 
 import AddIcon from "@mui/icons-material/Add"
 import LogoutIcon from "@mui/icons-material/Logout"
 import ModeEditIcon from "@mui/icons-material/ModeEdit"
-import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
-import Avatar from "@mui/material/Avatar"
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
+import { Avatar } from "@mui/material"
 import ConfirmModal from "components/ConfirmModal"
-import { ChatRoomApiPath } from "configs/api-paths"
-import { putData } from "helper"
+import { SOCKET_EVENT_NAMES } from "configs"
+import { ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
+import { putData, postData } from "helper"
 import ModalAddMember from "pages/ChatRoom/Content/FirstMessenger/ModalAddMember"
 import ModalChangeName from "pages/ChatRoom/Content/FirstMessenger/ModalChangeName"
 import ModalShowMembers from "pages/ChatRoom/Content/FirstMessenger/ModalShowMembers"
-import { useNavigate } from "react-router-dom"
 import { useStore } from "store"
-import { showNotification } from "utils"
+
 const NavItem = ({ onClick, icon, children, className = "" }) => {
     return (
         <div
@@ -35,16 +30,14 @@ const NavItem = ({ onClick, icon, children, className = "" }) => {
 }
 
 const InformationBar = () => {
-    const navigate = useNavigate()
-
     const [openModalChangeName, setOpenModalChangeName] = useState(false)
     const [openModalAddMem, setOpenModalAddMem] = useState(false)
     const [openShowMemModal, setOpenShowMemModal] = useState(false)
     const [openModalShowMembers, setOpenModalShowMembers] = useState(false)
 
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
-    const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
     const myInfor = useStore((state) => state.myInfor)
+    const socket = useStore((state) => state.socket)
     const setIsInforBarDisplayed = useStore((state) => state.setIsInforBarDisplayed)
 
     if (!chatRoomInfor){
@@ -63,17 +56,30 @@ const InformationBar = () => {
             return
         }
 
-        setChatRoomDescriptions(
-            [
-                {
-                    id: chatRoomInfor.id
-                }
-            ],
-            ENUM_STATUS_SET_STATE_ZUSTAND.REMOVE
-        )
-        showNotification("success", `Bạn đã thoát khỏi nhóm ${chatRoomInfor.name}`)
+        const mess = await postData(MessengerApiPath.index, {
+            content : "",
+            type    : ENUM_MESSAGE_TYPE.INFO,
+            info    : {
+                type   : ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT,
+                victim : myInfor.id
+            },
+            chatRoomId: chatRoomInfor.id
+        })
+
         setIsInforBarDisplayed()
-        navigate(`/`, { replace: true })
+
+        socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+            ...mess,
+            userIds: [
+                ...chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id)
+            ],
+            userInfor : myInfor,
+            chatRoom  : {
+                id     : chatRoomInfor.id,
+                name   : chatRoomInfor.name,
+                avatar : chatRoomInfor.avatar
+            }
+        })
     }
 
     return (

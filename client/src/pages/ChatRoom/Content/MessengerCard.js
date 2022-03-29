@@ -5,7 +5,7 @@ import React from "react"
 import Box from "@mui/material/Box"
 import { blue, teal } from "@mui/material/colors"
 
-export default function MessengerCard({ userInfor, content, type, info }){
+export default function MessengerCard({ userInfor, content, type, info, createdBy }){
     const showContent = () => {
         if (type === ENUM_MESSAGE_TYPE.TEXT){
             return (
@@ -21,7 +21,7 @@ export default function MessengerCard({ userInfor, content, type, info }){
         }
         if (type === ENUM_MESSAGE_TYPE.INFO){
             let str = "Bạn"
-            if(!userInfor?.isMe && userInfor?.fullName){
+            if (!userInfor?.isMe && userInfor?.fullName){
                 str = userInfor.fullName
             }
 
@@ -30,6 +30,13 @@ export default function MessengerCard({ userInfor, content, type, info }){
             }
             if (info.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER){
                 str += ` đã thêm ${info?.userInfor?.fullName}`
+            }
+            if (info.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT){
+                if (createdBy === info.victim){
+                    str += ` đã tự ra khỏi nhóm`
+                } else {
+                    str += ` đã kick ${info?.userInfor?.fullName} ra khỏi nhóm`
+                }
             }
 
             return (

@@ -7,7 +7,7 @@ import Avatar from "@mui/material/Avatar"
 import moment from "moment"
 import { useNavigate } from "react-router-dom"
 
-const ChatRoomCard = ({ info, isActive }) => {
+const ChatRoomCard = ({ info, isActive, userInfors }) => {
     const { lastMessengerInfor, avatar, name, id } = info
 
     const navigate = useNavigate()
@@ -41,6 +41,17 @@ const ChatRoomCard = ({ info, isActive }) => {
             }
             if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER){
                 return `${lastMessengerInfor.userName} đã thêm thành viên`
+            }
+            if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT){
+                const victimInfor = userInfors.find((u) => u.id === lastMessengerInfor.info.victim)
+
+                if (lastMessengerInfor.createdBy === lastMessengerInfor.info.victim){
+                    return `${victimInfor?.fullName} đã tự ra khỏi nhóm`
+                }
+
+                return `${lastMessengerInfor.userName} đã kick ${
+                    victimInfor?.fullName || "thành viên"
+                } ra khỏi nhóm`
             }
         }
 

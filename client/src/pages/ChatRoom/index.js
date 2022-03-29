@@ -1,4 +1,4 @@
-import { ENUM_STATUS_SET_STATE_ZUSTAND } from "constants"
+import { ENUM_STATUS_SET_STATE_ZUSTAND, ENUM_MESSAGE_INFO_TYPE } from "constants"
 
 import React, { useEffect } from "react"
 
@@ -64,7 +64,12 @@ const ChatRoom = () => {
     }, [socket, chatRoomInfor])
 
     useSocketOn(SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_MESSENGERS, (data) => {
-        console.log(data)
+        if (
+            data?.info?.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT &&
+            data?.info?.victim === myInfor.id
+        ){
+            return
+        }
         setMessengers([data])
     })
 

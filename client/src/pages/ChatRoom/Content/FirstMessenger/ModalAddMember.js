@@ -24,7 +24,7 @@ const ModalAddMember = ({ open, setOpen }) => {
 
     useEffect(() => {
         const getSuggestUsers = async() => {
-            if (!open || suggestUsers.length > 0) return
+            if (!open) return
 
             const res = await fetchData(
                 UserApiPath.suggestUsers(
@@ -48,9 +48,6 @@ const ModalAddMember = ({ open, setOpen }) => {
 
         if (res){
             setOpen(false)
-            setSuggestUsers(
-                suggestUsers.filter((info) => !chooseUsers.some((u) => u.id === info.id))
-            )
             setChooseUsers([])
             setSearch("")
             await Promise.all(
@@ -83,7 +80,6 @@ const ModalAddMember = ({ open, setOpen }) => {
             )
 
             showNotification("success", "Bạn đã thêm thành viên thành công")
-
         }
     }
 

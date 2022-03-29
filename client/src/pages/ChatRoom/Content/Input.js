@@ -40,7 +40,8 @@ const Input = () => {
                     .map((info) => info.id),
                 userInfor : myInfor,
                 chatRoom  : {
-                    name: chatRoomInfor.name
+                    id   : chatRoomInfor.id,
+                    name : chatRoomInfor.name
                 }
             })
 

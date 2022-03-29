@@ -29,11 +29,19 @@ const mutations = (set, get) => {
                 ...state,
                 myInfor: newInfo
             })),
-        setChatRoomInfor: (newInfo) => {
+        setChatRoomInfor: (newInfo, status = ENUM_STATUS_SET_STATE_ZUSTAND.ADD) => {
             if (!newInfo){
                 set((state) => ({
                     ...state,
                     chatRoomInfor: null
+                }))
+
+                return
+            }
+            if (status === ENUM_STATUS_SET_STATE_ZUSTAND.ADD_NEW){
+                set((state) => ({
+                    ...state,
+                    chatRoomInfor: newInfo
                 }))
 
                 return
@@ -60,6 +68,14 @@ const mutations = (set, get) => {
             }
         },
         setChatRoomDescriptions: (newDesc, status = ENUM_STATUS_SET_STATE_ZUSTAND.ADD) => {
+            if (status === ENUM_STATUS_SET_STATE_ZUSTAND.ADD_NEW){
+                set((state) => ({
+                    ...state,
+                    chatRoomDescriptions: newDesc
+                }))
+
+                return
+            }
             if (status === ENUM_STATUS_SET_STATE_ZUSTAND.REMOVE){
                 const temp = [...get().chatRoomDescriptions]
                 temp.splice(

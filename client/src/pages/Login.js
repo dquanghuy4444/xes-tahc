@@ -38,7 +38,7 @@ export default function Login(){
 
         if (res){
             localStorage.setItem("token", res)
-            navigate("/", { replace: true })
+            navigate("/")
             showNotification("info", "Chào mừng bạn đến với xes-tahc")
         } else {
             showNotification("error", "Đăng kí thất bại")
@@ -54,7 +54,7 @@ export default function Login(){
 
             if (res){
                 localStorage.setItem("token", res)
-                navigate("/", { replace: true })
+                navigate("/")
                 showNotification("info", "Chào mừng bạn đến với xes-tahc")
             } else {
                 showNotification("error", "Đăng nhập thất bại")

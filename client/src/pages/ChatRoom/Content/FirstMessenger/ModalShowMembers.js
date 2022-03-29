@@ -1,9 +1,4 @@
-import {
-    ENUM_UPDATE_MEMBER_TYPE,
-    ENUM_MESSAGE_TYPE,
-    ENUM_MESSAGE_INFO_TYPE,
-    ENUM_STATUS_SET_STATE_ZUSTAND
-} from "constants"
+import { ENUM_UPDATE_MEMBER_TYPE, ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
 
 import React, { useState } from "react"
 
@@ -12,19 +7,15 @@ import { Avatar, Stack } from "@mui/material"
 import { blue } from "@mui/material/colors"
 import ConfirmModal from "components/ConfirmModal"
 import Modal from "components/Modal"
-import { UserApiPath, ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
-import { fetchData, putData, postData } from "helper"
-import { useNavigate } from "react-router-dom"
+import { SOCKET_EVENT_NAMES } from "configs"
+import { ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
+import { putData, postData } from "helper"
 import { useStore } from "store"
-import { showNotification } from "utils"
 
 const ModalShowMembers = ({ open, setOpen }) => {
-    const navigate = useNavigate()
-
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
-    const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
-    const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
-    const setMessengers = useStore((state) => state.setMessengers)
+    const socket = useStore((state) => state.socket)
+    const myInfor = useStore((state) => state.myInfor)
 
     const [openShowMemModal, setOpenShowMemModal] = useState(false)
     const [removeUserInfor, setRemoveUserInfor] = useState("")
@@ -38,20 +29,28 @@ const ModalShowMembers = ({ open, setOpen }) => {
         if (!res){
             return
         }
+        const mess = await postData(MessengerApiPath.index, {
+            content : "",
+            type    : ENUM_MESSAGE_TYPE.INFO,
+            info    : {
+                type   : ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT,
+                victim : removeUserInfor.userId
+            },
+            chatRoomId: chatRoomInfor.id
+        })
 
-        if (removeUserInfor?.isMe){
-            setChatRoomDescriptions(
-                [
-                    {
-                        id: chatRoomInfor.id
-                    }
-                ],
-                ENUM_STATUS_SET_STATE_ZUSTAND.REMOVE
-            )
-            showNotification("success", `Bạn đã thoát khỏi nhóm ${chatRoomInfor.name}`)
-
-            navigate(`/`, { replace: true })
-        }
+        socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+            ...mess,
+            userIds: [
+                ...chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id)
+            ],
+            userInfor : myInfor,
+            chatRoom  : {
+                id     : chatRoomInfor.id,
+                name   : chatRoomInfor.name,
+                avatar : chatRoomInfor.avatar
+            }
+        })
     }
 
     const showMembers = () => {
