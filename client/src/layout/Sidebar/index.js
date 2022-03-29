@@ -53,6 +53,7 @@ const Sidebar = () => {
     )
 
     useSocketOn(SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION, (data) => {
+        console.log(data)
         setChatRoomDescriptions([data])
     })
 

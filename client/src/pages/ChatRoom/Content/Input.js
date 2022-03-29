@@ -38,8 +38,10 @@ const Input = () => {
                 userIds: chatRoomInfor.userInfors
                     .filter((info) => info.stillIn)
                     .map((info) => info.id),
-                userInfor    : myInfor,
-                chatRoomName : chatRoomInfor.name
+                userInfor : myInfor,
+                chatRoom  : {
+                    name: chatRoomInfor.name
+                }
             })
 
             setMessage("")

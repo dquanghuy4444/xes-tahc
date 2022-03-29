@@ -10,16 +10,17 @@ import React, { useState } from "react"
 import AddIcon from "@mui/icons-material/Add"
 import LogoutIcon from "@mui/icons-material/Logout"
 import ModeEditIcon from "@mui/icons-material/ModeEdit"
+import PeopleAltIcon from '@mui/icons-material/PeopleAlt';
 import Avatar from "@mui/material/Avatar"
 import ConfirmModal from "components/ConfirmModal"
 import { ChatRoomApiPath } from "configs/api-paths"
 import { putData } from "helper"
 import ModalAddMember from "pages/ChatRoom/Content/FirstMessenger/ModalAddMember"
 import ModalChangeName from "pages/ChatRoom/Content/FirstMessenger/ModalChangeName"
+import ModalShowMembers from "pages/ChatRoom/Content/FirstMessenger/ModalShowMembers"
 import { useNavigate } from "react-router-dom"
 import { useStore } from "store"
 import { showNotification } from "utils"
-
 const NavItem = ({ onClick, icon, children, className = "" }) => {
     return (
         <div
@@ -39,6 +40,7 @@ const InformationBar = () => {
     const [openModalChangeName, setOpenModalChangeName] = useState(false)
     const [openModalAddMem, setOpenModalAddMem] = useState(false)
     const [openShowMemModal, setOpenShowMemModal] = useState(false)
+    const [openModalShowMembers, setOpenModalShowMembers] = useState(false)
 
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
@@ -90,6 +92,8 @@ const InformationBar = () => {
 
             <ModalAddMember open={ openModalAddMem } setOpen={ setOpenModalAddMem } />
 
+            <ModalShowMembers open={ openModalShowMembers } setOpen={ setOpenModalShowMembers } />
+
             <div className="min-w-[360px] border-border border-l-2  p-4">
                 <div className="flex-center flex-col mb-6 mt-4">
                     <Avatar
@@ -101,6 +105,10 @@ const InformationBar = () => {
 
                     <p className="font-semibold mt-2">{ name }</p>
                 </div>
+
+                <NavItem icon={ <PeopleAltIcon /> } onClick={ () => setOpenModalShowMembers(true) }>
+                    Thành viên
+                </NavItem>
 
                 <NavItem icon={ <ModeEditIcon /> } onClick={ () => setOpenModalChangeName(true) }>
                     Đổi tên nhóm

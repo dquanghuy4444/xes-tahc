@@ -2,7 +2,6 @@ import { ENUM_UPDATE_MEMBER_TYPE, ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } fr
 
 import React, { useState, useEffect } from "react"
 
-
 import { Avatar, Button, Stack } from "@mui/material"
 import Checkbox from "@mui/material/Checkbox"
 import AvatarWithClose from "components/AvatarWithClose"
@@ -25,7 +24,7 @@ const ModalAddMember = ({ open, setOpen }) => {
 
     useEffect(() => {
         const getSuggestUsers = async() => {
-            if (!open) return
+            if (!open || suggestUsers.length > 0) return
 
             const res = await fetchData(
                 UserApiPath.suggestUsers(
@@ -48,6 +47,10 @@ const ModalAddMember = ({ open, setOpen }) => {
         })
 
         if (res){
+            setOpen(false)
+            setSuggestUsers(
+                suggestUsers.filter((info) => !chooseUsers.some((u) => u.id === info.id))
+            )
             setChooseUsers([])
             setSearch("")
             await Promise.all(
@@ -63,15 +66,24 @@ const ModalAddMember = ({ open, setOpen }) => {
                     })
                     socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
                         ...mess,
-                        userIds      : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
-                        userInfor    : myInfor,
-                        chatRoomName : chatRoomInfor.name
+                        userIds: [
+                            ...chatRoomInfor.userInfors
+                                .filter((info) => info.stillIn)
+                                .map((info) => info.id),
+                            ...chooseUsers.map((info) => info.id)
+                        ],
+                        userInfor : myInfor,
+                        chatRoom  : {
+                            id     : chatRoomInfor.id,
+                            name   : chatRoomInfor.name,
+                            avatar : chatRoomInfor.avatar
+                        }
                     })
                 })
             )
 
             showNotification("success", "Bạn đã thêm thành viên thành công")
-            setOpen(false)
+
         }
     }
 

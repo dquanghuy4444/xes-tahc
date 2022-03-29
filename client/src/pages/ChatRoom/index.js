@@ -64,6 +64,7 @@ const ChatRoom = () => {
     }, [socket, chatRoomInfor])
 
     useSocketOn(SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_MESSENGERS, (data) => {
+        console.log(data)
         setMessengers([data])
     })
 
