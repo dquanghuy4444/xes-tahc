@@ -126,6 +126,7 @@ export class ChatRoomsService {
                         userName = userInfor.fullName;
                     }
                     item.lastMessengerInfor = {
+                        createdBy: lastMessenger.createdBy,
                         createdAt: lastMessenger.createdAt,
                         content: lastMessenger.content,
                         type: lastMessenger.type,

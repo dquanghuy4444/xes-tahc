@@ -48,6 +48,7 @@ interface ILastMessengerInfor {
     content: string;
     type: ENUM_MESSAGE_TYPE;
     userName: string;
+    createdBy: string;
     createdAt: Date;
     hasRead: boolean;
     info?: MessageInfo;
