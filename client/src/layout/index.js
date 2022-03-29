@@ -1,7 +1,10 @@
 import React, { useEffect } from "react"
 
 import { SOCKET_EVENT_NAMES } from "configs"
+import { UserApiPath } from "configs/api-paths"
 import { SOCKET_URL } from "configs/env"
+import { fetchData } from "helper"
+import { useNavigate } from "react-router-dom"
 import { connect } from "socket.io-client"
 import { useStore } from "store"
 
@@ -13,14 +16,35 @@ import Sidebar from "./Sidebar"
 import "./index.css"
 
 const Index = ({ children }) => {
+    const navigate = useNavigate()
+
     const isInforBarDisplayed = useStore((state) => state.isInforBarDisplayed)
     const socket = useStore((state) => state.socket)
     const myInfor = useStore((state) => state.myInfor)
     const setSocket = useStore((state) => state.setSocket)
 
+    const setMyInfor = useStore((state) => state.setMyInfor)
+
     useEffect(() => {
-        setSocket(connect(SOCKET_URL))
+        const getAuthen = async() => {
+            const res = await fetchData(UserApiPath.myDetail)
+
+            if (!res){
+                navigate("/login", { replace: true })
+            }
+
+            setMyInfor(res)
+        }
+
+        getAuthen()
     }, [])
+
+    useEffect(() => {
+        if (!myInfor){
+            return
+        }
+        setSocket(connect(SOCKET_URL))
+    }, [myInfor])
 
     useEffect(() => {
         if (!socket || !myInfor){
@@ -32,7 +56,7 @@ const Index = ({ children }) => {
         return () => {
             socket.disconnect()
         }
-    }, [socket, myInfor])
+    }, [socket])
 
     return (
         <div className="h-screen flex flex-col bg-white">

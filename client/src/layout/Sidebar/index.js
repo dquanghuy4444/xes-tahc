@@ -30,6 +30,9 @@ const Sidebar = () => {
     useFetchDataNoSave(
         ChatRoomApiPath.myChatRoom,
         (res) => {
+            if(!res){
+                return
+            }
             const temp = res.sort((a, b) => {
                 if (!a.lastMessengerInfor){
                     return 1
