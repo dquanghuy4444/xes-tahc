@@ -20,7 +20,7 @@ const Input = () => {
     const myInfor = useStore((state) => state.myInfor)
 
     const [message, setMessage] = useState("")
-    const [isFocus, setIsFocus] = useState(true)
+    const [isFocused, setIsFocused] = useState(true)
 
     const handleSendMessage = async() => {
         if (!message){
@@ -50,7 +50,7 @@ const Input = () => {
     }
 
     useEventListener("keypress", (e) => {
-        if (e.keyCode === 13 && isFocus){
+        if (e.keyCode === 13 && isFocused){
             handleSendMessage()
         }
     })
@@ -64,9 +64,9 @@ const Input = () => {
                 hiddenLabel
                 size="small"
                 value={ message }
-                onBlur={ () => setIsFocus(false) }
+                onBlur={ () => setIsFocused(false) }
                 onChange={ (e) => setMessage(e.target.value) }
-                onFocus={ () => setIsFocus(true) }
+                onFocus={ () => setIsFocused(true) }
             />
 
             <SendIcon color="primary" sx={ { cursor: "pointer" } } onClick={ handleSendMessage } />

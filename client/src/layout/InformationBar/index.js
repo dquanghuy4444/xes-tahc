@@ -1,6 +1,6 @@
 import { ENUM_UPDATE_MEMBER_TYPE, ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
 
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 
 import AddIcon from "@mui/icons-material/Add"
 import LogoutIcon from "@mui/icons-material/Logout"
@@ -40,11 +40,18 @@ const InformationBar = () => {
     const socket = useStore((state) => state.socket)
     const setIsInforBarDisplayed = useStore((state) => state.setIsInforBarDisplayed)
 
+
+    useEffect(() => {
+        return () => {
+            setIsInforBarDisplayed(false)
+        }
+    }, [])
+
     if (!chatRoomInfor){
         return <></>
     }
 
-    const { avatar, userInfors, createdBy, isGroup, createdAt, name, id } = chatRoomInfor
+    const { avatar, name, id } = chatRoomInfor
 
     const handleRemoveUser = async() => {
         const res = await putData(ChatRoomApiPath.member(id), {

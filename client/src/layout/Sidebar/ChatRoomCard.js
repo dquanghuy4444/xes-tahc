@@ -3,11 +3,12 @@ import { ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
 import React from "react"
 
 import CircleIcon from "@mui/icons-material/Circle"
+import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
 import Avatar from "@mui/material/Avatar"
 import moment from "moment"
 import { useNavigate } from "react-router-dom"
 
-const ChatRoomCard = ({ info, isActive, userInfors }) => {
+const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
     const { lastMessengerInfor, avatar, name, id } = info
 
     const navigate = useNavigate()
@@ -65,7 +66,19 @@ const ChatRoomCard = ({ info, isActive, userInfors }) => {
             }` }
             onClick={ handleRedirectToChatRoom }
         >
-            <Avatar alt="Remy Sharp" src={ avatar } sx={ { width: 48, height: 48 } } />
+            <div className="relative">
+                <Avatar alt="Remy Sharp" src={ avatar } sx={ { width: 48, height: 48 } } />
+
+                { roomIsGroup && (
+                    <Avatar
+                        alt="Remy Sharp"
+                        className="absolute bottom-4 -left-1"
+                        sx={ { width: 20, height: 20 , bgcolor: "white" } }
+                    >
+                        <PeopleAltIcon className="text-quinary" sx={ { fontSize: 14 } } />
+                    </Avatar>
+                ) }
+            </div>
 
             <div className="ml-4">
                 <p

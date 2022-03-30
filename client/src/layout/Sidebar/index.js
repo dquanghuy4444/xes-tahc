@@ -5,7 +5,6 @@ import React, { useState } from "react"
 import AddIcon from "@mui/icons-material/Add"
 import Avatar from "@mui/material/Avatar"
 import { blue } from "@mui/material/colors"
-import SearchInput from "components/SearchInput"
 import { SOCKET_EVENT_NAMES } from "configs"
 import { ChatRoomApiPath } from "configs/api-paths"
 import { fetchData } from "helper"
@@ -17,13 +16,13 @@ import { showNotification } from "utils"
 
 import ChatRoomCard from "./ChatRoomCard"
 import ModalCreateRoom from "./ModalCreateRoom"
+import SearchChatRoomInput from "./SearchChatRoomInput"
 
 const Sidebar = () => {
     const { id } = useParams()
 
     const navigate = useNavigate()
 
-    const [search, setSearch] = useState("")
     const [openModalCreateRoom, setOpenModalCreateRoom] = useState(false)
 
     const myInfor = useStore((state) => state.myInfor)
@@ -130,16 +129,17 @@ const Sidebar = () => {
                         </Avatar>
                     </div>
 
-                    <SearchInput value={ search } onChange={ (e) => setSearch(e.target.value) } />
+                    <SearchChatRoomInput />
                 </div>
 
-                <div className="overflow-auto px-4 pb-2">
+                <div className="overflow-auto px-4 pb-2 ">
                     { chatRoomDescriptions?.length > 0 ? (
                         chatRoomDescriptions.map((item) => (
                             <ChatRoomCard
                                 info={ item }
                                 isActive={ item.id === id }
                                 key={ item.id }
+                                roomIsGroup={ item.isGroup }
                                 userInfors={ chatRoomInfor?.userInfors || [] }
                             />
                         ))

@@ -1,6 +1,8 @@
 export const ChatRoomApiPath = new (function(){
     (this.index = "chat-rooms"),
         (this.myChatRoom = `${this.index}/me`),
+        (this.myChatRoomBySearch = (search) => `${this.myChatRoom}/${search}`),
+        (this.ourChatRoom = (id) => `${this.myChatRoom}/user/${id}`),
         (this.chatRoomDetail = (id) => `${this.index}/${id}`),
         (this.member = (id) => `${this.index}/${id}/member`)
 })()

@@ -6,9 +6,9 @@ import InputAdornment from "@mui/material/InputAdornment"
 import InputLabel from "@mui/material/InputLabel"
 import OutlinedInput from "@mui/material/OutlinedInput"
 
-export default function SearchInput({ value, onChange }){
+export default function SearchInput(props){
     return (
-        <FormControl fullWidth sx={ { mt: 2 } }>
+        <FormControl fullWidth>
             <InputLabel htmlFor="outlined-adornment-amount">Tìm kiếm</InputLabel>
 
             <OutlinedInput
@@ -20,8 +20,7 @@ export default function SearchInput({ value, onChange }){
                         <SearchIcon />
                     </InputAdornment>
                   ) }
-                value={ value }
-                onChange={ onChange }
+                { ...props }
             />
         </FormControl>
     )
