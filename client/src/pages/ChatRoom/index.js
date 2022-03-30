@@ -74,7 +74,7 @@ const ChatRoom = () => {
     })
 
     return (
-        <div className="chat-room">
+        <div className="h-full chat-room">
             { chatRoomInfor ? (
                 <>
                     <Header />
@@ -82,10 +82,10 @@ const ChatRoom = () => {
                     <Content />
                 </>
             ) : (
-                <div className="w-full h-full flex-center flex-col space-y-6">
+                <div className="w-full h-full flex-center flex-col space-y-6 px-10">
                     <ChatIcon sx={ { fontSize: 120 } } />
 
-                    <p className="text-xl font-semibold">
+                    <p className="text-xl font-semibold text-center">
                         Hãy chọn một đoạn chat hoặc bắt đầu cuộc trò chuyện mới
                     </p>
                 </div>

@@ -116,7 +116,7 @@ const Sidebar = () => {
         <>
             <ModalCreateRoom open={ openModalCreateRoom } setOpen={ setOpenModalCreateRoom } />
 
-            <section className="min-w-[360px] h-full border-border border-r-2 flex flex-col">
+            <section className="hidden tablet:flex flex-col tablet:w-[320px] laptop:w-[360px] h-full border-border border-r-2">
                 <div className="p-4">
                     <div className="flex justify-between items-center">
                         <p className="font-semibold	text-lg	">Messengers</p>
