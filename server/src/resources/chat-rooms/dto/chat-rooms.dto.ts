@@ -28,7 +28,6 @@ export class UpdateRoomReq {
     name: string;
 
     @IsOptional()
-
     avatar: string;
 }
 
@@ -40,7 +39,7 @@ export class UpdateMemberReq {
     @IsNotEmpty()
     @ArrayMinSize(1)
     @IsArray()
-    @IsString({each: true})
+    @IsString({ each: true })
     userIds: string[];
 }
 
@@ -63,7 +62,7 @@ export class ChatRoomResponse {
     createdAt: Date;
     userIds: string[];
 
-    constructor(chatRoom: ChatRoom , userIds: string[] = []) {
+    constructor(chatRoom: ChatRoom, userIds: string[] = []) {
         this.id = chatRoom.id;
         this.name = chatRoom.name;
         this.avatar = chatRoom.avatar;
@@ -73,7 +72,7 @@ export class ChatRoomResponse {
         this.userIds = userIds;
     }
 }
-export class ChatRoomDescriptionResponse extends ChatRoomResponse{
+export class ChatRoomDescriptionResponse extends ChatRoomResponse {
     lastMessengerInfor: ILastMessengerInfor;
 
     constructor(chatRoom: ChatRoom) {
@@ -89,5 +88,21 @@ export class ChatRoomDetailResponse extends ChatRoomDescriptionResponse {
     constructor(chatRoom: ChatRoom, userInfors: UserInfor[]) {
         super(chatRoom);
         this.userInfors = userInfors;
+    }
+}
+
+export class SearchedRoomDescriptionResponse {
+    id: string;
+    avatar: string;
+    name: string;
+    isGroup: boolean;
+    description: string;
+
+    constructor(id: string, name: string, avatar: string, isGroup: boolean, description: string = '') {
+        this.id = id;
+        this.avatar = avatar;
+        this.name = name;
+        this.isGroup = isGroup;
+        this.description = description;
     }
 }

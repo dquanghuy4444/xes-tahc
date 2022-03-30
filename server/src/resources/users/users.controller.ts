@@ -2,7 +2,7 @@ import { Controller, Get, Put, Body, Req } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { ROUTER_USERS } from 'configs/routers';
 import { IdFromToken } from 'common/decorators/auth.decorator';
-import { UserInfor } from './dto/user.dto';
+import { IGetAllUserReq, UserInfor } from './dto/user.dto';
 
 @Controller(ROUTER_USERS)
 export class UsersController {
@@ -12,6 +12,7 @@ export class UsersController {
     getAll(@IdFromToken() idFromToken: string, @Req() req) {
         return this.usersService.getAll(req.query, idFromToken);
     }
+
     @Get('me')
     getMyDetail(@IdFromToken() idFromToken: string) {
         return this.usersService.getDetail(idFromToken);

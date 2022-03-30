@@ -6,6 +6,7 @@ import {
     ChatRoomResponse,
     CreateRoomReq,
     ENUM_UPDATE_MEMBER_TYPE,
+    SearchedRoomDescriptionResponse,
     UpdateMemberReq,
     UpdateRoomReq,
 } from './dto/chat-rooms.dto';
@@ -83,22 +84,19 @@ export class ChatRoomsService {
     }
 
     async getMyChatRooms(idFromToken: string) {
-        const rooms = await this.chatRoomModel.find({ userIds: idFromToken }).exec(); // findById
-
+        const chatParticipals = await this.chatParticipalModel
+            .find({
+                userInformations: { $elemMatch: { userId: idFromToken, stillIn: true } },
+            })
+            .exec();
         const result: ChatRoomDescriptionResponse[] = [];
 
         await Promise.all(
-            rooms.map(async (room) => {
+            chatParticipals.map(async (chatParticipal) => {
+                const room = await this.chatRoomModel.findById(chatParticipal.chatRoomId).exec(); // findById
+
                 const item = new ChatRoomDescriptionResponse(room);
-                const chatParticipal = await this.chatParticipalModel
-                    .findOne({
-                        chatRoomId: room.id,
-                        userInformations: { $elemMatch: { userId: idFromToken, stillIn: true } },
-                    })
-                    .exec();
-                if (!chatParticipal) {
-                    return;
-                }
+
                 if (!room.isGroup) {
                     const userInformation = chatParticipal.userInformations.find(
                         (infor) => infor.userId !== idFromToken,
@@ -179,5 +177,97 @@ export class ChatRoomsService {
 
             return res;
         }
+    }
+
+    async searchMyChatRooms(search: string, idFromToken: string) {
+        if (!search) {
+            return [];
+        }
+        const tempRooms: SearchedRoomDescriptionResponse[] = [];
+        const chatParticipals = await this.chatParticipalModel.find({
+            userInformations: { $elemMatch: { userId: idFromToken, stillIn: true } },
+        });
+
+        await Promise.all(
+            chatParticipals.map(async (chatParticipal) => {
+                const roomModel = await this.chatRoomModel
+                    .findOne({ _id: chatParticipal.chatRoomId, name: { $regex: '.*' + search + '.*' } })
+                    .exec();
+                if (!roomModel) {
+                    return;
+                }
+                const room = new ChatRoomResponse(roomModel);
+                const description = `Gồm có ${chatParticipal.userInformations.length} thành viên`;
+                tempRooms.push(new SearchedRoomDescriptionResponse(room.id, room.name, room.avatar, true, description));
+            }),
+        );
+
+        const users = await this.usersService.getAll({ search }, idFromToken); // findById
+        const tempUser = users.map(
+            (user) => new SearchedRoomDescriptionResponse(user.id, user.fullName, user.avatar, false),
+        );
+
+        return [...tempRooms, ...tempUser];
+    }
+
+    async findRoom(userId: string, idFromToken: string) {
+        const chatParticipals = await this.chatParticipalModel.aggregate([
+            {
+                $match: {
+                    $and: [
+                        {
+                            userInformations: { $elemMatch: { userId, stillIn: true } },
+                        },
+                        {
+                            userInformations: { $elemMatch: { userId: idFromToken, stillIn: true } },
+                        },
+                        {
+                            $expr: {
+                                $eq: [
+                                    {
+                                        $size: '$userInformations',
+                                    },
+                                    2,
+                                ],
+                            },
+                        },
+                    ],
+                },
+            },
+            {
+                $project: { chatRoomObjId: { $toObjectId: '$chatRoomId' } },
+            },
+            {
+                $lookup: {
+                    from: 'chatrooms',
+                    localField: 'chatRoomObjId',
+                    foreignField: '_id',
+                    as: 'chatRooms',
+                },
+            },
+            {
+                $match: {
+                    chatRooms: {
+                        $elemMatch: { isGroup: false },
+                    },
+                },
+            },
+        ]);
+
+        if (chatParticipals.length === 0) {
+            const chatRoom = await this.create(
+                {
+                    name: '',
+                    avatar: '',
+                    isGroup: false,
+                    userIds: [userId],
+                },
+                idFromToken,
+            );
+
+            return chatRoom.id;
+        }
+
+        return chatParticipals[0]?.chatRooms[0]._id;
     }
 }

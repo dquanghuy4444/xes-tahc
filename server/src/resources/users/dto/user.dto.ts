@@ -1,4 +1,4 @@
-import { User } from "../entities/user.entity";
+import { User } from '../entities/user.entity';
 
 export class UserInfor {
     id: string;
@@ -14,4 +14,9 @@ export class UserInfor {
         this.phoneNumber = user.phoneNumber;
         this.email = user.email;
     }
+}
+
+export interface IGetAllUserReq {
+    remove_users?: string;
+    search?: string;
 }
