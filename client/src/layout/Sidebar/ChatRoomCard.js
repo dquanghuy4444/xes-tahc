@@ -70,13 +70,11 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
                 <Avatar alt="Remy Sharp" src={ avatar } sx={ { width: 48, height: 48 } } />
 
                 { roomIsGroup && (
-                    <Avatar
-                        alt="Remy Sharp"
-                        className="absolute bottom-4 -left-1"
-                        sx={ { width: 20, height: 20 , bgcolor: "white" } }
-                    >
-                        <PeopleAltIcon className="text-quinary" sx={ { fontSize: 14 } } />
-                    </Avatar>
+                    <div className="absolute bottom-0 -left-1">
+                        <Avatar alt="Remy Sharp" sx={ { width: 20, height: 20, bgcolor: "white" } }>
+                            <PeopleAltIcon className="text-quinary" sx={ { fontSize: 14 } } />
+                        </Avatar>
+                    </div>
                 ) }
             </div>
 
