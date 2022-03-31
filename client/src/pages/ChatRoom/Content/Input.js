@@ -2,11 +2,15 @@ import { ENUM_MESSAGE_TYPE } from "constants"
 
 import React, { useState } from "react"
 
+import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions"
 import InsertPhotoIcon from "@mui/icons-material/InsertPhoto"
 import SendIcon from "@mui/icons-material/Send"
-import TextField from "@mui/material/TextField"
+import IconButton from "@mui/material/IconButton"
+import InputAdornment from "@mui/material/InputAdornment"
+import OutlinedInput from "@mui/material/OutlinedInput"
 import { SOCKET_EVENT_NAMES } from "configs"
 import { MessengerApiPath } from "configs/api-paths"
+import Picker from "emoji-picker-react"
 import { postData } from "helper"
 import useEventListener from "hooks/useEventListener"
 import { useParams } from "react-router-dom"
@@ -21,6 +25,7 @@ const Input = () => {
 
     const [message, setMessage] = useState("")
     const [isFocused, setIsFocused] = useState(true)
+    const [isEmojiDisplayed, setIsEmojiDisplayed] = useState(false)
 
     const handleSendMessage = async() => {
         if (!message){
@@ -58,19 +63,41 @@ const Input = () => {
         }
     })
 
+    const handleAddEmoji = (e , emojiObject) => {
+        setMessage((prev) => prev + emojiObject.emoji)
+    }
+
     return (
         <div className="min-h-[60px] flex items-center space-x-3 px-4">
             <InsertPhotoIcon color="primary" sx={ { cursor: "pointer" } } />
 
-            <TextField
-                fullWidth
-                hiddenLabel
-                size="small"
-                value={ message }
-                onBlur={ () => setIsFocused(false) }
-                onChange={ (e) => setMessage(e.target.value) }
-                onFocus={ () => setIsFocused(true) }
-            />
+            <div className="relative flex-1">
+                <OutlinedInput
+                    fullWidth
+                    endAdornment={ (
+                        <InputAdornment position="end">
+                            <IconButton edge="end" onClick={ () => setIsEmojiDisplayed((prev) => !prev) }>
+                                <EmojiEmotionsIcon />
+                            </IconButton>
+                        </InputAdornment>
+                      ) }
+                    size="small"
+                    value={ message }
+                    onBlur={ () => setIsFocused(false) }
+                    onChange={ (e) => setMessage(e.target.value) }
+                    onFocus={ () => setIsFocused(true) }
+                />
+
+                <Picker
+                    pickerStyle={ {
+                        display  : isEmojiDisplayed ? "" : "none",
+                        position : "absolute",
+                        right    : 0,
+                        bottom   : "120%"
+                    } }
+                    onEmojiClick={ handleAddEmoji }
+                />
+            </div>
 
             <SendIcon color="primary" sx={ { cursor: "pointer" } } onClick={ handleSendMessage } />
         </div>
