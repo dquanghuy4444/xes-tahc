@@ -20,7 +20,7 @@ export class UsersService {
                 _id: {
                     $nin: [...removeUsers, idFromToken],
                 },
-                fullName: { $regex: '.*' + search + '.*' },
+                fullName: { $regex: search, $options: 'i' },
             })
             .exec();
 

@@ -192,7 +192,7 @@ export class ChatRoomsService {
         await Promise.all(
             chatParticipals.map(async (chatParticipal) => {
                 const roomModel = await this.chatRoomModel
-                    .findOne({ _id: chatParticipal.chatRoomId, name: { $regex: '.*' + search + '.*', $options: 'i' } })
+                    .findOne({ _id: chatParticipal.chatRoomId, name: { $regex: search, $options: 'i' } })
                     .exec();
                 if (!roomModel) {
                     return;
