@@ -16,6 +16,7 @@ import { Messenger } from 'resources/messengers/entities/messenger.entity';
 import { ChatParticipalsService } from 'resources/chat-participals/chat-participals.service';
 import { ChatParticipal, IUserInformation } from 'resources/chat-participals/entities/chat-participal.entity';
 import { UsersService } from 'resources/users/users.service';
+import { MY_NAME } from 'configs';
 
 @Injectable()
 export class ChatRoomsService {
@@ -116,7 +117,7 @@ export class ChatRoomsService {
                     .exec();
 
                 if (lastMessenger) {
-                    let userName = 'Bạn';
+                    let userName = MY_NAME;
 
                     if (room.isGroup && lastMessenger.createdBy !== idFromToken) {
                         const userInfor = await this.usersService.getDetail(lastMessenger.createdBy);
@@ -191,7 +192,7 @@ export class ChatRoomsService {
         await Promise.all(
             chatParticipals.map(async (chatParticipal) => {
                 const roomModel = await this.chatRoomModel
-                    .findOne({ _id: chatParticipal.chatRoomId, name: { $regex: '.*' + search + '.*' } })
+                    .findOne({ _id: chatParticipal.chatRoomId, name: { $regex: '.*' + search + '.*', $options: 'i' } })
                     .exec();
                 if (!roomModel) {
                     return;
