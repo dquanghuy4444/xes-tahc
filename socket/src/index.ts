@@ -91,11 +91,11 @@ io.on('connection', (socket) => {
 
 				const roomName = isGroup
 					? name
-					: data.userInfors.find((i) => i.id !== userId)?.fullName ||
+					: data.userInfors?.find((i) => i.id !== userId)?.fullName ||
 					  'Chat riêng';
 				const roomAvatar = isGroup
 					? avatar
-					: data.userInfors.find((i) => i.id !== userId)?.avatar ||
+					: data.userInfors?.find((i) => i.id !== userId)?.avatar ||
 					  '';
 
 				io.to(user.socketId).emit(
