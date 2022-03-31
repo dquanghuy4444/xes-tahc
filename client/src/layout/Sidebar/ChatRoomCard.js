@@ -5,6 +5,7 @@ import React from "react"
 import CircleIcon from "@mui/icons-material/Circle"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
 import Avatar from "@mui/material/Avatar"
+import AvatarWithOnline from "components/AvatarWithOnline"
 import { MY_NAME } from "configs"
 import moment from "moment"
 import { useNavigate } from "react-router-dom"
@@ -84,14 +85,25 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
             onClick={ handleRedirectToChatRoom }
         >
             <div className="relative">
-                <Avatar alt="Remy Sharp" src={ avatar } sx={ { width: 48, height: 48 } } />
+                { roomIsGroup ? (
+                    <>
+                        <Avatar alt="Remy Sharp" src={ avatar } sx={ { width: 52, height: 52 } } />
 
-                { roomIsGroup && (
-                    <div className="absolute bottom-0 -left-1">
-                        <Avatar alt="Remy Sharp" sx={ { width: 20, height: 20, bgcolor: "white" } }>
-                            <PeopleAltIcon className="text-quinary" sx={ { fontSize: 14 } } />
-                        </Avatar>
-                    </div>
+                        <div className="absolute bottom-0 -left-1">
+                            <Avatar
+                                alt="Remy Sharp"
+                                sx={ { width: 20, height: 20, bgcolor: "white" } }
+                            >
+                                <PeopleAltIcon className="text-quinary" sx={ { fontSize: 14 } } />
+                            </Avatar>
+                        </div>
+                    </>
+                ) : (
+                    <AvatarWithOnline
+                        isOnline={ false }
+                        src={ avatar }
+                        sx={ { width: 52, height: 52 } }
+                    />
                 ) }
             </div>
 

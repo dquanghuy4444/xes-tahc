@@ -42,6 +42,7 @@ export class UsersService {
                 {
                     fullName: updateUserReq.fullName,
                     phoneNumber: updateUserReq.phoneNumber,
+                    isOnline: updateUserReq.isOnline,
                 },
                 { new: true },
             )

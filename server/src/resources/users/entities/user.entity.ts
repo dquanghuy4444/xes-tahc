@@ -14,6 +14,8 @@ export class User extends Document {
     email: string;
     @Prop()
     password: string;
+    @Prop()
+    isOnline: boolean;
     @Prop({ type: Date, default: Date.now })
     createdAt: Date;
 }
