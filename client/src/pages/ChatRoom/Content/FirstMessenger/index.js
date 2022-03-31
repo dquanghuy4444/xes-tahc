@@ -1,3 +1,4 @@
+
 import React, { useState } from "react"
 
 import AddReactionIcon from "@mui/icons-material/AddReaction"
@@ -6,6 +7,7 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
 import { Stack } from "@mui/material"
 import Avatar from "@mui/material/Avatar"
 import { blue } from "@mui/material/colors"
+import { MY_NAME } from "configs"
 import { useStore } from "store"
 import { formatDatetime } from "utils/datetime"
 
@@ -35,7 +37,7 @@ export default function FirstMessenger(){
         if (!userInfor){
             return <></>
         }
-        let name = "Bạn"
+        let name = MY_NAME
         if (!userInfor?.isMe){
             name = userInfor.fullName
         }
@@ -95,7 +97,6 @@ export default function FirstMessenger(){
                             justifyContent="center"
                             sx={ { minWidth: 80 } }
                             onClick={ () => setOpenModalShowMembers(true) }
-
                         >
                             <Avatar
                                 sx={ { bgcolor: blue[50], width: 48, height: 48, cursor: "pointer" } }

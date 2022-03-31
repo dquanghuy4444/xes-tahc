@@ -38,10 +38,13 @@ const Input = () => {
                 userIds: chatRoomInfor.userInfors
                     .filter((info) => info.stillIn)
                     .map((info) => info.id),
-                userInfor : myInfor,
-                chatRoom  : {
-                    id   : chatRoomInfor.id,
-                    name : chatRoomInfor.name
+                userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
+                senderInfor : myInfor,
+                chatRoom    : {
+                    id      : chatRoomInfor.id,
+                    name    : chatRoomInfor.name,
+                    avatar  : chatRoomInfor.avatar,
+                    isGroup : chatRoomInfor.isGroup
                 }
             })
 

@@ -4,6 +4,7 @@ import React from "react"
 
 import Box from "@mui/material/Box"
 import { blue, teal } from "@mui/material/colors"
+import { MY_NAME } from "configs"
 
 export default function MessengerCard({ userInfor, content, type, info, createdBy }){
     const showContent = () => {
@@ -20,7 +21,7 @@ export default function MessengerCard({ userInfor, content, type, info, createdB
             )
         }
         if (type === ENUM_MESSAGE_TYPE.INFO){
-            let str = "Bạn"
+            let str = MY_NAME
             if (!userInfor?.isMe && userInfor?.fullName){
                 str = userInfor.fullName
             }

@@ -59,6 +59,7 @@ const Sidebar = ({className}) => {
     useSocketOn(
         SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION,
         async(data) => {
+            console.log(data)
             if (
                 data?.lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT &&
                 data?.lastMessengerInfor?.info?.victim === myInfor.id
@@ -80,8 +81,7 @@ const Sidebar = ({className}) => {
 
                 return
             }
-            if (chatRoomInfor.id === data.id){
-            }
+
             if (data?.lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
                 setChatRoomInfor({
                     name: data.name

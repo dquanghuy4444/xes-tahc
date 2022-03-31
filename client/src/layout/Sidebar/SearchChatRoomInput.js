@@ -1,3 +1,5 @@
+import { ENUM_TYPE_FINDED_CHAT_ROOM } from "constants"
+
 import React, { useState, useEffect } from "react"
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
@@ -41,16 +43,20 @@ export default function SearchChatRoomInput(){
 
         return searchedRoomDescriptions.map((desc) => {
             const handleRedirectToChatRoom = async() => {
+                setIsFocused(false)
+
                 if (desc.isGroup){
                     navigate(`/room/${desc.id}`)
-                } else {
-                    const res = await fetchData(ChatRoomApiPath.ourChatRoom(desc.id))
-                    if (res){
-                        navigate(`/room/${res}`)
-                    }
+
+                    return
                 }
 
-                setIsFocused(false)
+                const res = await fetchData(ChatRoomApiPath.ourChatRoom(desc.id))
+                if (!res){
+                    return
+                }
+
+                navigate(`/room/${res}`)
             }
 
             return (

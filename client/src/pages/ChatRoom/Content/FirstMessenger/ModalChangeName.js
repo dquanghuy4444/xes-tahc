@@ -54,9 +54,9 @@ export default function ModalChangeName({ open, setOpen }){
         if (mess){
             socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
                 ...mess,
-                userIds   : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
-                userInfor : myInfor,
-                chatRoom  : {
+                userIds     : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
+                senderInfor : myInfor,
+                chatRoom    : {
                     id: chatRoomInfor.id,
                     name
                 }

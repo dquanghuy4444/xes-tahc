@@ -44,8 +44,8 @@ const ModalShowMembers = ({ open, setOpen }) => {
             userIds: [
                 ...chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id)
             ],
-            userInfor : myInfor,
-            chatRoom  : {
+            senderInfor : myInfor,
+            chatRoom    : {
                 id     : chatRoomInfor.id,
                 name   : chatRoomInfor.name,
                 avatar : chatRoomInfor.avatar

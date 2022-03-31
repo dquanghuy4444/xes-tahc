@@ -1,10 +1,12 @@
 import { ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
 
+
 import React from "react"
 
 import CircleIcon from "@mui/icons-material/Circle"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
 import Avatar from "@mui/material/Avatar"
+import { MY_NAME } from "configs"
 import moment from "moment"
 import { useNavigate } from "react-router-dom"
 
@@ -34,7 +36,7 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
             return "Chưa có tin nhắn nào"
         }
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.TEXT){
-            return `${lastMessengerInfor.userName} : ${lastMessengerInfor.content}`
+            return `${lastMessengerInfor.userName === MY_NAME ? `${lastMessengerInfor.userName} : ` : ""}${lastMessengerInfor.content}`
         }
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.INFO){
             if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){

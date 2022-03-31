@@ -13,3 +13,6 @@ const SOCKET_EVENT_NAMES = {
 
 
 export { SOCKET_EVENT_NAMES }
+
+export const MY_NAME = "Bạn"
+
