@@ -30,13 +30,13 @@ export default function MessengerCard({ userInfor, content, type, info, createdB
                 str += " đã đổi tên nhóm thành "
             }
             if (info.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER){
-                str += ` đã thêm ${info?.userInfor?.fullName}`
+                str += ` đã thêm ${info?.userInfor?.isMe ? MY_NAME : info?.userInfor?.fullName}`
             }
             if (info.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT){
                 if (createdBy === info.victim){
                     str += ` đã tự ra khỏi nhóm`
                 } else {
-                    str += ` đã kick ${info?.userInfor?.fullName} ra khỏi nhóm`
+                    str += ` đã kick ${info?.userInfor?.isMe ? MY_NAME : info?.userInfor?.fullName} ra khỏi nhóm`
                 }
             }
 

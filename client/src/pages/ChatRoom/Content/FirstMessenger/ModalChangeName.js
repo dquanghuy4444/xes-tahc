@@ -57,7 +57,8 @@ export default function ModalChangeName({ open, setOpen }){
                 userIds     : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
                 senderInfor : myInfor,
                 chatRoom    : {
-                    id: chatRoomInfor.id,
+                    isGroup : chatRoomInfor.isGroup,
+                    id      : chatRoomInfor.id,
                     name
                 }
             })

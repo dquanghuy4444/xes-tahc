@@ -30,7 +30,7 @@ const NavItem = ({ onClick, icon, children, className = "" }) => {
     )
 }
 
-const InformationBar = ({className}) => {
+const InformationBar = ({ className }) => {
     const [openModalChangeName, setOpenModalChangeName] = useState(false)
     const [openModalAddMem, setOpenModalAddMem] = useState(false)
     const [openShowMemModal, setOpenShowMemModal] = useState(false)
@@ -40,6 +40,12 @@ const InformationBar = ({className}) => {
     const myInfor = useStore((state) => state.myInfor)
     const socket = useStore((state) => state.socket)
     const setIsInforBarDisplayed = useStore((state) => state.setIsInforBarDisplayed)
+
+    useEffect(() => {
+        if (!chatRoomInfor?.isGroup){
+            setIsInforBarDisplayed(false)
+        }
+    }, [chatRoomInfor])
 
     useEffect(() => {
         return () => {
@@ -82,9 +88,10 @@ const InformationBar = ({className}) => {
             ],
             senderInfor : myInfor,
             chatRoom    : {
-                id     : chatRoomInfor.id,
-                name   : chatRoomInfor.name,
-                avatar : chatRoomInfor.avatar
+                id      : chatRoomInfor.id,
+                name    : chatRoomInfor.name,
+                isGroup : chatRoomInfor.isGroup,
+                avatar  : chatRoomInfor.avatar
             }
         })
     }
@@ -107,7 +114,9 @@ const InformationBar = ({className}) => {
 
             <ModalShowMembers open={ openModalShowMembers } setOpen={ setOpenModalShowMembers } />
 
-            <div className={ `w-full laptop:w-auto tablet:min-w-[360px] laptop:border-border laptop:border-l-2 h-screen tablet:h-auto  p-4 ${className}` }>
+            <div
+                className={ `w-full laptop:w-auto tablet:min-w-[360px] laptop:border-border laptop:border-l-2 h-screen tablet:h-auto  p-4 ${className}` }
+            >
                 <div className="laptop:hidden" onClick={ () => setIsInforBarDisplayed(false) }>
                     <ArrowBackIcon />
                 </div>

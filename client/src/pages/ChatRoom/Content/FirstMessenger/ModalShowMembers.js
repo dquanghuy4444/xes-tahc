@@ -46,9 +46,10 @@ const ModalShowMembers = ({ open, setOpen }) => {
             ],
             senderInfor : myInfor,
             chatRoom    : {
-                id     : chatRoomInfor.id,
-                name   : chatRoomInfor.name,
-                avatar : chatRoomInfor.avatar
+                isGroup : chatRoomInfor.isGroup,
+                id      : chatRoomInfor.id,
+                name    : chatRoomInfor.name,
+                avatar  : chatRoomInfor.avatar
             }
         })
     }

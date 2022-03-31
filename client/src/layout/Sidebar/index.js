@@ -18,7 +18,7 @@ import ChatRoomCard from "./ChatRoomCard"
 import ModalCreateRoom from "./ModalCreateRoom"
 import SearchChatRoomInput from "./SearchChatRoomInput"
 
-const Sidebar = ({className}) => {
+const Sidebar = ({ className }) => {
     const { id } = useParams()
 
     const navigate = useNavigate()
@@ -60,10 +60,12 @@ const Sidebar = ({className}) => {
         SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION,
         async(data) => {
             console.log(data)
-            if (
-                data?.lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT &&
-                data?.lastMessengerInfor?.info?.victim === myInfor.id
-            ){
+
+            const {
+                lastMessengerInfor
+            } = data
+
+            if (lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT && lastMessengerInfor?.info?.victim === myInfor.id){
                 setChatRoomDescriptions(
                     [
                         {
@@ -82,13 +84,20 @@ const Sidebar = ({className}) => {
                 return
             }
 
-            if (data?.lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
+            setChatRoomDescriptions([data])
+
+
+            if (chatRoomInfor?.id !== data.id){
+                return
+            }
+
+            if (lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
                 setChatRoomInfor({
                     name: data.name
                 })
             } else if (
-                data?.lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER ||
-                data?.lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT
+                lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER ||
+                lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT
             ){
                 const res = await fetchData(ChatRoomApiPath.chatRoomDetail(id))
                 setChatRoomInfor(
@@ -107,8 +116,6 @@ const Sidebar = ({className}) => {
                     ENUM_STATUS_SET_STATE_ZUSTAND.ADD_NEW
                 )
             }
-
-            setChatRoomDescriptions([data])
         }
     )
 
@@ -116,7 +123,9 @@ const Sidebar = ({className}) => {
         <>
             <ModalCreateRoom open={ openModalCreateRoom } setOpen={ setOpenModalCreateRoom } />
 
-            <section className={ `tablet:flex flex-col w-full tablet:w-[320px] laptop:w-[360px] h-full border-border tablet:border-r-2 ${className}` }>
+            <section
+                className={ `tablet:flex flex-col w-full tablet:w-[320px] laptop:w-[360px] h-full border-border tablet:border-r-2 ${className}` }
+            >
                 <div className="p-4">
                     <div className="flex justify-between items-center">
                         <p className="font-semibold	text-lg	">Messengers</p>

@@ -50,7 +50,7 @@ const ModalAddMember = ({ open, setOpen }) => {
             setOpen(false)
             setChooseUsers([])
             setSearch("")
-            
+
             await Promise.all(
                 chooseUsers.map(async(info) => {
                     const mess = await postData(MessengerApiPath.index, {
@@ -72,9 +72,10 @@ const ModalAddMember = ({ open, setOpen }) => {
                         ],
                         senderInfor : myInfor,
                         chatRoom    : {
-                            id     : chatRoomInfor.id,
-                            name   : chatRoomInfor.name,
-                            avatar : chatRoomInfor.avatar
+                            id      : chatRoomInfor.id,
+                            name    : chatRoomInfor.name,
+                            isGroup : chatRoomInfor.isGroup,
+                            avatar: chatRoomInfor.avatar
                         }
                     })
                 })

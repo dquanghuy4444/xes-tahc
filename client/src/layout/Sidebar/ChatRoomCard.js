@@ -36,7 +36,7 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
             return "Chưa có tin nhắn nào"
         }
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.TEXT){
-            return `${lastMessengerInfor.userName === MY_NAME ? `${lastMessengerInfor.userName} : ` : ""}${lastMessengerInfor.content}`
+            return `${lastMessengerInfor.userName === MY_NAME || roomIsGroup ? `${lastMessengerInfor.userName} : ` : ""}${lastMessengerInfor.content}`
         }
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.INFO){
             if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
