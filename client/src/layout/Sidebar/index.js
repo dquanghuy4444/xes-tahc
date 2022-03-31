@@ -59,7 +59,6 @@ const Sidebar = ({ className }) => {
     useSocketOn(
         SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION,
         async(data) => {
-            console.log(data)
 
             const {
                 lastMessengerInfor

@@ -1,6 +1,5 @@
 import { ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
 
-
 import React from "react"
 
 import CircleIcon from "@mui/icons-material/Circle"
@@ -21,8 +20,20 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
         }
 
         const { createdAt } = lastMessengerInfor
-        let str = moment(createdAt).fromNow()
-        str = str.replace("minutes ago", "phút")
+        const duration = moment.duration(moment().diff(moment(createdAt)))
+        let time = Math.ceil(duration.asMinutes())
+
+        let str = `${time} phút`
+
+        if (time >= 60){
+            time = Math.ceil(duration.asHours())
+            str = `${time} giờ`
+        }
+
+        if (time >= 24){
+            time = Math.ceil(duration.asDays())
+            str = `${time} ngày`
+        }
 
         return <p className="text-xs text-quinary">{ str }</p>
     }
@@ -36,7 +47,11 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
             return "Chưa có tin nhắn nào"
         }
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.TEXT){
-            return `${lastMessengerInfor.userName === MY_NAME || roomIsGroup ? `${lastMessengerInfor.userName} : ` : ""}${lastMessengerInfor.content}`
+            return `${
+                lastMessengerInfor.userName === MY_NAME || roomIsGroup
+                    ? `${lastMessengerInfor.userName} : `
+                    : ""
+            }${lastMessengerInfor.content}`
         }
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.INFO){
             if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){

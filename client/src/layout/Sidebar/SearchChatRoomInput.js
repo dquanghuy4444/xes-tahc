@@ -1,5 +1,3 @@
-import { ENUM_TYPE_FINDED_CHAT_ROOM } from "constants"
-
 import React, { useState, useEffect } from "react"
 
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
@@ -7,6 +5,7 @@ import Avatar from "@mui/material/Avatar"
 import SearchInput from "components/SearchInput"
 import { ChatRoomApiPath } from "configs/api-paths"
 import { fetchData } from "helper"
+import useDebounce from "hooks/useDebounce"
 import { useNavigate } from "react-router-dom"
 
 export default function SearchChatRoomInput(){
@@ -16,18 +15,20 @@ export default function SearchChatRoomInput(){
     const [isFocused, setIsFocused] = useState(false)
     const [searchedRoomDescriptions, setSearchedRoomDescriptions] = useState([])
 
-    useEffect(() => {
-        const getSearchedRoomDescription = async() => {
-            if (!isFocused){
-                return
-            }
-            const res = await fetchData(ChatRoomApiPath.myChatRoomBySearch(search))
-
-            setSearchedRoomDescriptions(res)
+    const getSearchedRoomDescription = async(s) => {
+        if (!isFocused){
+            return
         }
+        const res = await fetchData(ChatRoomApiPath.myChatRoomBySearch(s))
 
-        getSearchedRoomDescription()
-    }, [search])
+        setSearchedRoomDescriptions(res)
+    }
+
+    useDebounce(
+        () => getSearchedRoomDescription(search),
+        [search]
+    )
+
 
     useEffect(() => {
         if (!isFocused){

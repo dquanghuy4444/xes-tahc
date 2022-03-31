@@ -63,6 +63,12 @@ const Input = () => {
         }
     })
 
+    useEventListener("keyup", (e) => {
+        if (e.key === "Escape" && isEmojiDisplayed){
+            setIsEmojiDisplayed(false)
+        }
+    })
+
     const handleAddEmoji = (e , emojiObject) => {
         setMessage((prev) => prev + emojiObject.emoji)
     }
