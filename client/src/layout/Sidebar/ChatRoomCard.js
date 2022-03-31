@@ -108,7 +108,7 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
                     <p
                         className={ `${
                             lastMessengerInfor?.hasRead ? "text-quinary" : "font-semibold"
-                        } text-sm text-overflow max-w-[160px]` }
+                        } text-sm text-overflow laptop:max-w-[160px] tablet:max-w-[120px] max-w-[180px]` }
                     >
                         { getContentLastMessenger() }
                     </p>

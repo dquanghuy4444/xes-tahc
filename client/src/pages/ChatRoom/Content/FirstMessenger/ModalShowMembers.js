@@ -58,7 +58,7 @@ const ModalShowMembers = ({ open, setOpen }) => {
         if (chatRoomInfor.userInfors.length === 0) return <></>
 
         return (
-            <div className="max-h-[240px] overflow-auto">
+            <div className="h-[240px] overflow-auto">
                 { chatRoomInfor.userInfors
                     .filter((info) => info.stillIn)
                     .map((info) => {

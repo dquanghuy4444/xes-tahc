@@ -75,7 +75,7 @@ const ModalAddMember = ({ open, setOpen }) => {
                             id      : chatRoomInfor.id,
                             name    : chatRoomInfor.name,
                             isGroup : chatRoomInfor.isGroup,
-                            avatar: chatRoomInfor.avatar
+                            avatar  : chatRoomInfor.avatar
                         }
                     })
                 })
@@ -89,7 +89,7 @@ const ModalAddMember = ({ open, setOpen }) => {
         if (suggestUsers.length === 0) return <></>
 
         return (
-            <div className="mt-2 max-h-[240px] overflow-auto">
+            <div className="mt-2 h-[240px] overflow-auto">
                 { suggestUsers.map((info) => {
                     const handleChooseUser = () => {
                         if (chooseUsers.some((i) => i.id === info.id)){
@@ -126,7 +126,7 @@ const ModalAddMember = ({ open, setOpen }) => {
 
     const showChooseUsers = () => {
         return (
-            <div className="h-[100px] flex items-center">
+            <div className="h-[100px] flex items-center space-x-2">
                 { chooseUsers.length === 0 && (
                     <p className="text-center w-full text-quinary">Chưa chọn người nào</p>
                 ) }
@@ -163,7 +163,7 @@ const ModalAddMember = ({ open, setOpen }) => {
 
                     { suggestUsers.length > 0 && <p>Gợi ý</p> }
 
-                    <div className="max-h-[240px] overflow-auto">{ showSuggestUsers() }</div>
+                    { showSuggestUsers() }
 
                     <Button
                         fullWidth

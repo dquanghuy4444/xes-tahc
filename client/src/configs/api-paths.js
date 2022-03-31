@@ -8,18 +8,29 @@ export const ChatRoomApiPath = new (function(){
 })()
 
 export const MessengerApiPath = new (function(){
-    this.index = "messengers",
-    this.messengersInRoom = (id) => `${this.index}/${id}`
+    (this.index = "messengers"), (this.messengersInRoom = (id) => `${this.index}/${id}`)
 })()
 
 export const AuthApiPath = new (function(){
-    this.index = "auth",
-    this.login = `${this.index}/login`,
-    this.register = `${this.index}/register`
+    (this.index = "auth"),
+        (this.login = `${this.index}/login`),
+        (this.register = `${this.index}/register`)
 })()
 
 export const UserApiPath = new (function(){
-    this.index = "users",
-    this.myDetail = `${this.index}/me`,
-    this.suggestUsers = (removeUsers = []) => `${this.index}${removeUsers.length === 0 ? "" : `?remove_users=${removeUsers.join(',')}`}`
+    (this.index = "users"),
+        (this.myDetail = `${this.index}/me`),
+        (this.suggestUsers = (removeUsers = [], search = "") => {
+            const arrStr = []
+            if (removeUsers.length > 0){
+                arrStr.push(`remove_users=${removeUsers.join(",")}`)
+            }
+            if (search){
+                arrStr.push(`search=${search}`)
+            }
+
+            const paramsStr = arrStr.join("&")
+
+            return `${this.index}${paramsStr ? `?${paramsStr}` : ""}`
+        })
 })()

@@ -60,7 +60,7 @@ const ModalCreateRoom = ({ open, setOpen }) => {
         if (suggestUsers.length === 0) return <></>
 
         return (
-            <div className="mt-2 max-h-[240px] overflow-auto">
+            <div className="mt-2 h-[240px] overflow-auto">
                 { suggestUsers.map((info) => {
                     const handleChooseUser = () => {
                         if (chooseUsers.some((i) => i.id === info.id)){
@@ -144,7 +144,7 @@ const ModalCreateRoom = ({ open, setOpen }) => {
 
                     { suggestUsers.length > 0 && <p>Gợi ý</p> }
 
-                    <div className="max-h-[240px] overflow-auto">{ showSuggestUsers() }</div>
+                    { showSuggestUsers() }
 
                     <Button
                         fullWidth
