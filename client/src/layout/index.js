@@ -68,7 +68,7 @@ const Index = ({ children }) => {
             <main className="flex main-layout max-w-screen">
                 <Sidebar className={ pathname !== "/" ? "hidden " : "overflow-auto" } />
 
-                <Content className={ `${pathname === "/" ? "hidden tablet:block" : ""} ${isInforBarDisplayed ? "hidden" : ""}` }>
+                <Content className={ `${pathname === "/" ? "hidden tablet:block" : ""} ${isInforBarDisplayed ? "hidden laptop:block" : ""}` }>
                     { children }
                 </Content>
 

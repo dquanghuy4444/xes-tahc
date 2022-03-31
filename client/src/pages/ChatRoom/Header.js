@@ -10,12 +10,11 @@ import { useStore } from "store"
 const Header = () => {
     const navigate = useNavigate()
 
-    const roomInfor = useStore((state) => state.chatRoomInfor)
+    const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const setToggleInforBarDisplayed = useStore((state) => state.setToggleInforBarDisplayed)
 
     const handleRedirectToDashboard = () => {
         navigate("/", { replace: true })
-
     }
 
     return (
@@ -24,16 +23,22 @@ const Header = () => {
                 <ArrowBackIcon />
             </div>
 
-            <Avatar alt="Remy Sharp" src={ roomInfor?.avatar || "" } sx={ { width: 48, height: 48 } } />
-
-            <p className="ml-4 font-semibold text-[19px]">{ roomInfor?.name }</p>
-
             <Avatar
-                sx={ { bgcolor: blue[50], cursor: "pointer", width: 36, height: 36, ml: "auto" } }
-                onClick={ () => setToggleInforBarDisplayed() }
-            >
-                <MoreHorizIcon sx={ { fontSize: 20, color: "black" } } />
-            </Avatar>
+                alt="Remy Sharp"
+                src={ chatRoomInfor?.avatar || "" }
+                sx={ { width: 48, height: 48 } }
+            />
+
+            <p className="ml-4 font-semibold text-[19px]">{ chatRoomInfor?.name }</p>
+
+            { chatRoomInfor?.isGroup && (
+                <Avatar
+                    sx={ { bgcolor: blue[50], cursor: "pointer", width: 36, height: 36, ml: "auto" } }
+                    onClick={ () => setToggleInforBarDisplayed() }
+                >
+                    <MoreHorizIcon sx={ { fontSize: 20, color: "black" } } />
+                </Avatar>
+            ) }
         </div>
     )
 }

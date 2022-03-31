@@ -49,7 +49,7 @@ export default function FirstMessenger(){
                 <ModalShowMembers open={ openModalShowMembers } setOpen={ setOpenModalShowMembers } />
 
                 <div>
-                    <p className="text-quinary text-sm">
+                    <p className="text-quinary text-sm text-center px-6">
                         { name } đã tạo phòng này vào lúc { formatDatetime(createdAt) }
                     </p>
 

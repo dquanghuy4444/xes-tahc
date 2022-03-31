@@ -107,7 +107,7 @@ const InformationBar = ({className}) => {
 
             <ModalShowMembers open={ openModalShowMembers } setOpen={ setOpenModalShowMembers } />
 
-            <div className={ `min-w-[360px] laptop:border-border laptop:border-l-2  p-4 ${className}` }>
+            <div className={ `w-full laptop:w-auto tablet:min-w-[360px] laptop:border-border laptop:border-l-2 h-screen tablet:h-auto  p-4 ${className}` }>
                 <div className="laptop:hidden" onClick={ () => setIsInforBarDisplayed(false) }>
                     <ArrowBackIcon />
                 </div>
