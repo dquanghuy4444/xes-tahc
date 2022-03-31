@@ -2,7 +2,7 @@ import express from 'express';
 import http from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
-import { SOCKET_EVENT_NAMES } from './constants';
+import { MY_NAME, SOCKET_EVENT_NAMES } from './constants';
 import {
 	addUser,
 	removeUser,
@@ -84,29 +84,42 @@ io.on('connection', (socket) => {
 
 			data.userIds.forEach((userId: string) => {
 				const user: IUser = getUser(userId);
-				if (user) {
-					io.to(user.socketId).emit(
-						SOCKET_EVENT_NAMES.SERVER_SOCKET
-							.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION,
-						{
-							id                 : data.chatRoom.id,
-							lastMessengerInfor : {
-								type       : data.type,
-								content    : data.content,
-								attachment : data?.attachment,
-								info       : data?.info,
-								createdAt  : data?.createdAt,
-								createdBy  : data?.createdBy,
-								userName   :
-									user.id === data?.createdBy
-										? 'Bạn'
-										: data.userInfor.fullName,
-							},
-                            name   : data.chatRoom.name,
-                            avatar : data.chatRoom.avatar,
-						},
-					);
+				if (!user) {
+					return;
 				}
+				const { id, name, avatar, isGroup } = data.chatRoom;
+
+				const roomName = isGroup
+					? name
+					: data.userInfors.find((i) => i.id !== userId)?.fullName ||
+					  'Chat riêng';
+				const roomAvatar = isGroup
+					? avatar
+					: data.userInfors.find((i) => i.id !== userId)?.avatar ||
+					  '';
+
+				io.to(user.socketId).emit(
+					SOCKET_EVENT_NAMES.SERVER_SOCKET
+						.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION,
+					{
+						id,
+						lastMessengerInfor: {
+							type       : data.type,
+							content    : data.content,
+							attachment : data?.attachment,
+							info       : data?.info,
+							createdAt  : data?.createdAt,
+							createdBy  : data?.createdBy,
+							userName   :
+								userId === data?.createdBy
+									? MY_NAME
+									: data.senderInfor.fullName,
+						},
+						name   : roomName,
+						avatar : roomAvatar,
+						isGroup,
+					},
+				);
 			});
 		},
 	);

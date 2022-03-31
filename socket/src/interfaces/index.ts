@@ -50,15 +50,17 @@ export class IUserInfor {
 }
 
 export class IChatRoom {
-    name: string;
+	name: string;
 
-    id: string;
+	id: string;
 
-    avatar: string;
+	avatar: string;
+
+	isGroup: boolean;
 }
 
 export interface ISendMessReq {
-    chatRoom: IChatRoom;
+	chatRoom: IChatRoom;
 	id: string;
 	type: ENUM_MESSAGE_TYPE;
 	createdBy: string;
@@ -67,5 +69,6 @@ export interface ISendMessReq {
 	info?: MessageInfo;
 	createdAt: Date;
 	userIds: string[];
-	userInfor: IUserInfor;
+	userInfors?: IUserInfor[];
+	senderInfor: IUserInfor;
 }

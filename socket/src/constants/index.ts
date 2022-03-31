@@ -28,3 +28,5 @@ export enum ENUM_MESSAGE_INFO_TYPE {
     REJECTED = 'REJECTED',
     CHANGE_NAME_GROUP = 'CHANGE_NAME_GROUP',
 }
+
+export const MY_NAME = "Bạn"
