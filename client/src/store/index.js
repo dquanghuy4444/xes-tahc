@@ -14,7 +14,12 @@ const initialState = {
 
 const mutations = (set, get) => {
     return {
-        setIsInforBarDisplayed: () =>
+        setIsInforBarDisplayed: (newState) =>
+            set((state) => ({
+                ...state,
+                isInforBarDisplayed: newState
+            })),
+        setToggleInforBarDisplayed: () =>
             set((state) => ({
                 ...state,
                 isInforBarDisplayed: !state.isInforBarDisplayed

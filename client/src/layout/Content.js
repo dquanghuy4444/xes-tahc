@@ -1,8 +1,8 @@
 import React from 'react';
 
-const Content = ({children}) => {
+const Content = ({children , className}) => {
     return (
-        <section className="flex-1">
+        <section className={ `flex-1 ${className}` }>
             { children }
         </section>
     );

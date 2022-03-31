@@ -3,6 +3,7 @@ import { ENUM_UPDATE_MEMBER_TYPE, ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } fr
 import React, { useState, useEffect } from "react"
 
 import AddIcon from "@mui/icons-material/Add"
+import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import LogoutIcon from "@mui/icons-material/Logout"
 import ModeEditIcon from "@mui/icons-material/ModeEdit"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
@@ -29,7 +30,7 @@ const NavItem = ({ onClick, icon, children, className = "" }) => {
     )
 }
 
-const InformationBar = () => {
+const InformationBar = ({className}) => {
     const [openModalChangeName, setOpenModalChangeName] = useState(false)
     const [openModalAddMem, setOpenModalAddMem] = useState(false)
     const [openShowMemModal, setOpenShowMemModal] = useState(false)
@@ -39,7 +40,6 @@ const InformationBar = () => {
     const myInfor = useStore((state) => state.myInfor)
     const socket = useStore((state) => state.socket)
     const setIsInforBarDisplayed = useStore((state) => state.setIsInforBarDisplayed)
-
 
     useEffect(() => {
         return () => {
@@ -73,7 +73,7 @@ const InformationBar = () => {
             chatRoomId: chatRoomInfor.id
         })
 
-        setIsInforBarDisplayed()
+        setIsInforBarDisplayed(false)
 
         socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
             ...mess,
@@ -107,7 +107,11 @@ const InformationBar = () => {
 
             <ModalShowMembers open={ openModalShowMembers } setOpen={ setOpenModalShowMembers } />
 
-            <div className="min-w-[360px] border-border border-l-2  p-4">
+            <div className={ `min-w-[360px] laptop:border-border laptop:border-l-2  p-4 ${className}` }>
+                <div className="laptop:hidden" onClick={ () => setIsInforBarDisplayed(false) }>
+                    <ArrowBackIcon />
+                </div>
+
                 <div className="flex-center flex-col mb-6 mt-4">
                     <Avatar
                         alt="Remy Sharp"

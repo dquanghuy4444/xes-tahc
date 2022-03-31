@@ -18,7 +18,7 @@ import ChatRoomCard from "./ChatRoomCard"
 import ModalCreateRoom from "./ModalCreateRoom"
 import SearchChatRoomInput from "./SearchChatRoomInput"
 
-const Sidebar = () => {
+const Sidebar = ({className}) => {
     const { id } = useParams()
 
     const navigate = useNavigate()
@@ -116,7 +116,7 @@ const Sidebar = () => {
         <>
             <ModalCreateRoom open={ openModalCreateRoom } setOpen={ setOpenModalCreateRoom } />
 
-            <section className="hidden tablet:flex flex-col tablet:w-[320px] laptop:w-[360px] h-full border-border border-r-2">
+            <section className={ `tablet:flex flex-col w-full tablet:w-[320px] laptop:w-[360px] h-full border-border tablet:border-r-2 ${className}` }>
                 <div className="p-4">
                     <div className="flex justify-between items-center">
                         <p className="font-semibold	text-lg	">Messengers</p>

@@ -4,7 +4,7 @@ import { SOCKET_EVENT_NAMES } from "configs"
 import { UserApiPath } from "configs/api-paths"
 import { SOCKET_URL } from "configs/env"
 import { fetchData } from "helper"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, useLocation } from "react-router-dom"
 import { connect } from "socket.io-client"
 import { useStore } from "store"
 
@@ -17,6 +17,9 @@ import "./index.css"
 
 const Index = ({ children }) => {
     const navigate = useNavigate()
+
+    const location = useLocation()
+    const { pathname } = location
 
     const isInforBarDisplayed = useStore((state) => state.isInforBarDisplayed)
     const socket = useStore((state) => state.socket)
@@ -60,14 +63,16 @@ const Index = ({ children }) => {
 
     return (
         <div className="h-screen flex flex-col bg-white">
-            <Header />
+            <Header className={ pathname !== "/" ? "hidden tablet:flex" : "flex" } />
 
             <main className="flex main-layout max-w-screen">
-                <Sidebar />
+                <Sidebar className={ pathname !== "/" ? "hidden " : "overflow-auto" } />
 
-                <Content>{ children }</Content>
+                <Content className={ `${pathname === "/" ? "hidden tablet:block" : ""} ${isInforBarDisplayed ? "hidden" : ""}` }>
+                    { children }
+                </Content>
 
-                { isInforBarDisplayed && <InformationBar /> }
+                <InformationBar className={ `${isInforBarDisplayed ? "" : "hidden"}` } />
             </main>
         </div>
     )
