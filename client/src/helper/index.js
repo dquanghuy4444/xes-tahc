@@ -23,9 +23,7 @@ const fetchData = async(path, payload) => {
 
 const putData = async(path, data) => {
     try {
-        const response = await axios.put(path, {
-            ...data
-        })
+        const response = await axios.put(path, data)
 
         return handleTransformResponse(response)
     } catch (ex){
@@ -35,12 +33,9 @@ const putData = async(path, data) => {
     }
 }
 
-const postData = async(path, data) => {
+const postData = async(path, data , config = null) => {
     try {
-        const temp = {
-            ...data
-        }
-        const response = await axios.post(path, temp)
+        const response = await axios.post(path, data , config)
 
         return handleTransformResponse(response)
     } catch (ex){

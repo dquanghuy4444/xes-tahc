@@ -8,7 +8,9 @@ export const ChatRoomApiPath = new (function(){
 })()
 
 export const MessengerApiPath = new (function(){
-    (this.index = "messengers"), (this.messengersInRoom = (id) => `${this.index}/${id}`)
+    (this.index = "messengers"),
+    (this.messengersInRoom = (id) => `${this.index}/${id}`),
+    (this.sendFiles = `${this.index}/files`)
 })()
 
 export const AuthApiPath = new (function(){
