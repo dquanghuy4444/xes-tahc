@@ -10,7 +10,7 @@ import { MY_NAME } from "configs"
 import moment from "moment"
 import { useNavigate } from "react-router-dom"
 
-const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
+const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup , roomIsOnline }) => {
     const { lastMessengerInfor, avatar, name, id } = info
 
     const navigate = useNavigate()
@@ -100,7 +100,7 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
                     </>
                 ) : (
                     <AvatarWithOnline
-                        isOnline={ true }
+                        isOnline={ roomIsOnline }
                         src={ avatar }
                         sx={ { width: 52, height: 52 } }
                     />

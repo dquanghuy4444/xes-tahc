@@ -59,12 +59,12 @@ const Sidebar = ({ className }) => {
     useSocketOn(
         SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION,
         async(data) => {
+            const { lastMessengerInfor } = data
 
-            const {
-                lastMessengerInfor
-            } = data
-
-            if (lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT && lastMessengerInfor?.info?.victim === myInfor.id){
+            if (
+                lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT &&
+                lastMessengerInfor?.info?.victim === myInfor.id
+            ){
                 setChatRoomDescriptions(
                     [
                         {
@@ -84,7 +84,6 @@ const Sidebar = ({ className }) => {
             }
 
             setChatRoomDescriptions([data])
-
 
             if (chatRoomInfor?.id !== data.id){
                 return
@@ -118,6 +117,25 @@ const Sidebar = ({ className }) => {
         }
     )
 
+    useSocketOn(SOCKET_EVENT_NAMES.SERVER_SOCKET.STATUS_USER, async(data) => {
+        setChatRoomDescriptions(
+            [
+                {
+                    id       : data.chatRoomId,
+                    isOnline : data.isOnline
+                }
+            ]
+        )
+
+        if (chatRoomInfor?.id !== data.chatRoomId){
+            return
+        }
+
+        setChatRoomInfor({
+            isOnline: data.isOnline
+        })
+    })
+
     return (
         <>
             <ModalCreateRoom open={ openModalCreateRoom } setOpen={ setOpenModalCreateRoom } />
@@ -148,6 +166,7 @@ const Sidebar = ({ className }) => {
                                 isActive={ item.id === id }
                                 key={ item.id }
                                 roomIsGroup={ item.isGroup }
+                                roomIsOnline={ item.isOnline }
                                 userInfors={ chatRoomInfor?.userInfors || [] }
                             />
                         ))

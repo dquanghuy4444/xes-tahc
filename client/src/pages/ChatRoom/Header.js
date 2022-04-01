@@ -4,6 +4,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
 import Avatar from "@mui/material/Avatar"
 import { blue } from "@mui/material/colors"
+import AvatarWithOnline from "components/AvatarWithOnline"
 import { useNavigate } from "react-router-dom"
 import { useStore } from "store"
 
@@ -23,8 +24,9 @@ const Header = () => {
                 <ArrowBackIcon />
             </div>
 
-            <Avatar
+            <AvatarWithOnline
                 alt="Remy Sharp"
+                isOnline={ chatRoomInfor?.isOnline || false }
                 src={ chatRoomInfor?.avatar || "" }
                 sx={ { width: 48, height: 48 } }
             />
