@@ -17,6 +17,7 @@ import {
 	ISendUserIDReq,
 	IUser,
 } from './interfaces';
+import { fetchData } from './helper';
 
 dotenv.config();
 
@@ -28,7 +29,6 @@ const io = new Server(server, {
 		methods : ['GET', 'POST'],
 	},
 	serveClient  : false,
-	// below are engine.IO options
 	pingInterval : 10000,
 	pingTimeout  : 5000,
 	cookie       : false,
@@ -41,21 +41,54 @@ server.listen(process.env.PORT || 6798, () => {
 io.on('connection', (socket) => {
 	console.log(`New Socket ID :${socket.id}`);
 
-	socket.on('disconnect', () => {
+	socket.on('disconnect', async() => {
 		console.log('------------------------------');
 		console.log(`Disconnect ID :${socket.id}`);
 		console.log('------------------------------');
 
-		removeUser(socket.id);
+		const removedId = await removeUser(socket.id);
 
-		// socket.broadcast.emit("server-send-listusers", arrUsers);
-		// socket.broadcast.emit("server-send-userlogout", socket.Username);
+		const res = await fetchData(`chat-rooms/private/${removedId}`);
+		if (!res) {
+			return;
+		}
+		res.forEach((info: any) => {
+			const user: IUser = getUser(info.userId);
+			if (!user) {
+				return;
+			}
+			io.to(user.socketId).emit(
+				SOCKET_EVENT_NAMES.SERVER_SOCKET.STATUS_USER,
+				{
+					...info,
+					isOnline: false,
+				},
+			);
+		});
 	});
 
 	socket.on(
 		SOCKET_EVENT_NAMES.CLIENT.SEND_USERID,
-		({ id }: ISendUserIDReq) => {
-			addUser(id, socket.id, '');
+		async({ id }: ISendUserIDReq) => {
+			await addUser(id, socket.id, '');
+
+			const res = await fetchData(`chat-rooms/private/${id}`);
+			if (!res) {
+				return;
+			}
+			res.forEach((info: any) => {
+				const user: IUser = getUser(info.userId);
+				if (!user) {
+					return;
+				}
+				io.to(user.socketId).emit(
+					SOCKET_EVENT_NAMES.SERVER_SOCKET.STATUS_USER,
+					{
+						...info,
+						isOnline: true,
+					},
+				);
+			});
 		},
 	);
 
@@ -136,51 +169,4 @@ io.on('connection', (socket) => {
 			}
 		});
 	});
-
-	// socket.on("client-send-username", (data) => {
-	//     if (arrUsers.indexOf(data) >= 0) {
-	//         socket.emit("server-send-reg-fail");
-	//     } else {
-	//         socket.Username = data;
-	//         arrUsers.push(data);
-	//         socket.emit("server-send-reg-success", data);
-	//         io.sockets.emit("server-send-listusers", arrUsers);
-	//         socket.broadcast.emit("server-send-userlogin", socket.Username);
-	//     }
-	// });
-
-	// socket.on("client-send-logoutevent", () => {
-	//     arrUsers.splice(arrUsers.indexOf(socket.Username), 1);
-
-	//     socket.broadcast.emit("server-send-listusers", arrUsers);
-	//     socket.broadcast.emit("server-send-userlogout", socket.Username);
-	// });
-
-	// socket.on("client-send-mess", (data) => {
-	//     const text = socket.Username + " : " + data;
-	//     socket.broadcast.emit("server-send-mess-forglobal", text);
-	//     const text2 = "Tôi : " + data;
-	//     socket.emit("server-send-mess-forme", text2);
-	// });
-
-	// socket.on("client-send-writingevent", () => {
-	//     if (arrUsersWriting.indexOf(socket.Username) < 0) {
-	//         arrUsersWriting.push(socket.Username);
-	//         socket.broadcast.emit(
-	//             "server-send-listuserswriting",
-	//             arrUsersWriting
-	//         );
-	//     }
-	// });
-
-	// socket.on("client-send-stopwritingevent", () => {
-	//     if (arrUsersWriting.indexOf(socket.Username) >= 0) {
-	//         arrUsersWriting.splice(arrUsersWriting.indexOf(socket.Username), 1);
-
-	//         socket.broadcast.emit(
-	//             "server-send-listuserswriting",
-	//             arrUsersWriting
-	//         );
-	//     }
-	// });
 });
