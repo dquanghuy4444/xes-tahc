@@ -100,7 +100,7 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup }) => {
                     </>
                 ) : (
                     <AvatarWithOnline
-                        isOnline={ false }
+                        isOnline={ true }
                         src={ avatar }
                         sx={ { width: 52, height: 52 } }
                     />
