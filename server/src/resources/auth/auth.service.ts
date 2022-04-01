@@ -22,8 +22,6 @@ export class AuthService {
     }
 
     private async sendMail(email, subject, text, html) {
-        console.log(getEnv(ENUM_ENVIRONMENT_VARIABLE.NODEMAILER_MAIL_USERNAME));
-        console.log(getEnv(ENUM_ENVIRONMENT_VARIABLE.NODEMAILER_MAIL_PASSWORD));
         const smtpTransport = createTransport({
             service: getEnv(ENUM_ENVIRONMENT_VARIABLE.NODEMAILER_MAIL_SERVICE),
             auth: {

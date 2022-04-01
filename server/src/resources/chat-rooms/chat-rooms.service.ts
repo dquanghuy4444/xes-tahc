@@ -80,7 +80,9 @@ export class ChatRoomsService {
         if (!result.isGroup) {
             result.name = userInfors[0].fullName;
             result.avatar = userInfors[0].avatar;
+            result.isOnline = userInfors[0].isOnline;
         }
+
         return result;
     }
 
@@ -106,6 +108,7 @@ export class ChatRoomsService {
 
                     item.name = userInfor.fullName;
                     item.avatar = userInfor.avatar;
+                    item.isOnline = userInfor.isOnline;
                 }
 
                 const myInfor = chatParticipal.userInformations.find((infor) => infor.userId === idFromToken);
@@ -270,5 +273,54 @@ export class ChatRoomsService {
         }
 
         return chatParticipals[0]?.chatRooms[0]._id;
+    }
+
+    async getPrivateChatRoom(userId:string){
+        await this.usersService.getDetail(userId);
+
+        const chatParticipals = await this.chatParticipalModel.aggregate([
+            {
+                $match: {
+                    $and: [
+                        {
+                            userInformations: { $elemMatch: { userId, stillIn: true } },
+                        },
+                        {
+                            $expr: {
+                                $eq: [
+                                    {
+                                        $size: '$userInformations',
+                                    },
+                                    2,
+                                ],
+                            },
+                        },
+                    ],
+                },
+            },
+            {
+                $project: { chatRoomObjId: { $toObjectId: '$chatRoomId' } , infors: "$userInformations" },
+            },
+            {
+                $lookup: {
+                    from: 'chatrooms',
+                    localField: 'chatRoomObjId',
+                    foreignField: '_id',
+                    as: 'chatRooms',
+                },
+            },
+            {
+                $match: {
+                    chatRooms: {
+                        $elemMatch: { isGroup: false },
+                    },
+                },
+            },
+        ]);
+
+        return chatParticipals.map((i) =>({
+            chatRoomId: i.chatRoomObjId,
+            userId:  i.infors.find(infor => infor.userId !== userId)?.userId
+        }))
     }
 }

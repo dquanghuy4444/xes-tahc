@@ -57,6 +57,7 @@ export class ChatRoomResponse {
     id: string;
     name: string;
     isGroup: boolean;
+    isOnline: boolean;
     avatar: string;
     createdBy: string;
     createdAt: Date;
@@ -84,10 +85,12 @@ export class ChatRoomDescriptionResponse extends ChatRoomResponse {
 
 export class ChatRoomDetailResponse extends ChatRoomDescriptionResponse {
     userInfors: UserInfor[];
+    isOnline: boolean;
 
     constructor(chatRoom: ChatRoom, userInfors: UserInfor[]) {
         super(chatRoom);
         this.userInfors = userInfors;
+        this.isOnline = false;
     }
 }
 

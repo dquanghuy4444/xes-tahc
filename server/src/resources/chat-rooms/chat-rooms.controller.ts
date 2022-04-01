@@ -33,6 +33,11 @@ export class ChatRoomsController {
         return this.chatRoomsService.searchMyChatRooms(search , idFromToken);
     }
 
+    @Get('private/:userId')
+    getPrivateChatRoom(@Param('userId') userId: string) {
+        return this.chatRoomsService.getPrivateChatRoom(userId);
+    }
+
     @Put(':id')
     update(@IdFromToken() idFromToken: string, @Param('id') chatRoomId: string, @Body() updateRoomReq: UpdateRoomReq) {
         return this.chatRoomsService.update(chatRoomId, updateRoomReq, idFromToken);

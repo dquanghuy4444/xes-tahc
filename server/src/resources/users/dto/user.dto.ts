@@ -22,3 +22,9 @@ export interface IGetAllUserReq {
     remove_users?: string;
     search?: string;
 }
+
+
+export interface IUpdateOnlOffStatusReq{
+    id: string;
+    isOnline: boolean;
+}

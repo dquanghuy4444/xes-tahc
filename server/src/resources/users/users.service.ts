@@ -2,7 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from './entities/user.entity';
 import { Model } from 'mongoose';
-import { IGetAllUserReq, UserInfor } from './dto/user.dto';
+import { IGetAllUserReq, IUpdateOnlOffStatusReq, UserInfor } from './dto/user.dto';
 
 @Injectable()
 export class UsersService {
@@ -50,6 +50,23 @@ export class UsersService {
         if (!user) {
             throw new BadRequestException();
         }
-        return;
+        return true;
+    }
+
+    async updateOnlOffStatus(updateOnlOffStatusReq: IUpdateOnlOffStatusReq) {
+
+        const user = await this.userModel
+            .findByIdAndUpdate(
+                updateOnlOffStatusReq.id,
+                {
+                    isOnline: updateOnlOffStatusReq.isOnline,
+                },
+                { new: true },
+            )
+            .exec();
+        if (!user) {
+            throw new BadRequestException();
+        }
+        return true;
     }
 }

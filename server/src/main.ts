@@ -17,7 +17,7 @@ async function bootstrap() {
         new FastifyAdapter({ logger: getEnv(ENUM_ENVIRONMENT_VARIABLE.NODE_ENV) === 'dev' }),
     );
     app.setGlobalPrefix('v1');
-
+    
     const config = new DocumentBuilder().setTitle('NestJS Auth').setDescription('').setVersion('1.0').build();
 
     const document = SwaggerModule.createDocument(app, config);
