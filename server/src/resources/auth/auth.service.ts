@@ -42,7 +42,7 @@ export class AuthService {
     }
 
     async register(registerReq: RegisterRequest): Promise<string> {
-        const { username, password, phoneNumber, email , fullName } = registerReq;
+        const { username, password, phoneNumber, email, fullName } = registerReq;
         let user = await this.userModel.findOne({ username }).exec();
         if (user) {
             throw new BadRequestException('Username exists');
@@ -52,6 +52,7 @@ export class AuthService {
             phoneNumber,
             email,
             fullName,
+            isOnline: false,
             password: await hash(password, 10),
         });
         const authToken = this.createToken(user._id as string);
