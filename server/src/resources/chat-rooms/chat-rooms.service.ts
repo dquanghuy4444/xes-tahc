@@ -26,7 +26,7 @@ export class ChatRoomsService {
         @InjectModel(ChatRoom.name) private chatRoomModel: Model<ChatRoom>,
         @InjectModel(ChatParticipal.name) private chatParticipalModel: Model<ChatParticipal>,
         @InjectModel(Messenger.name) private messengerModel: Model<Messenger>,
-    ) {}
+    ) { }
 
     async create(createRoomChatReq: CreateRoomReq, idFromToken: string) {
         const me = await this.usersService.getDetail(idFromToken);
@@ -87,60 +87,74 @@ export class ChatRoomsService {
     }
 
     async getMyChatRooms(idFromToken: string) {
-        const chatParticipals = await this.chatParticipalModel
-            .find({
-                userInformations: { $elemMatch: { userId: idFromToken, stillIn: true } },
-            })
-            .exec();
         const result: ChatRoomDescriptionResponse[] = [];
 
-        await Promise.all(
-            chatParticipals.map(async (chatParticipal) => {
-                const room = await this.chatRoomModel.findById(chatParticipal.chatRoomId).exec(); // findById
+        const chatParticipals = await this.chatParticipalModel.aggregate([
+            {
+                $match: {
+                    userInformations: { $elemMatch: { userId: idFromToken, stillIn: true } }
+                },
+            },
+            {
+                $project: { chatRoomObjId: { $toObjectId: '$chatRoomId' }, userInformations: "$userInformations" },
+            },
+            {
+                $lookup: {
+                    from: 'chatrooms',
+                    localField: 'chatRoomObjId',
+                    foreignField: '_id',
+                    as: 'chatRooms',
+                },
+            },
+        ])
 
-                const item = new ChatRoomDescriptionResponse(room);
+        await Promise.all(chatParticipals.map(async (chatParticipal: any) => {
+            const item = chatParticipal.chatRooms[0]
+            const room = new ChatRoomDescriptionResponse(item)
 
-                if (!room.isGroup) {
-                    const userInformation = chatParticipal.userInformations.find(
-                        (infor) => infor.userId !== idFromToken,
-                    );
-                    const userInfor = await this.usersService.getDetail(userInformation.userId);
+            if (!room.isGroup) {
+                const userInformation = chatParticipal.userInformations.find(
+                    (infor) => infor.userId !== idFromToken,
+                );
+                const userInfor = await this.usersService.getDetail(userInformation.userId);
 
-                    item.name = userInfor.fullName;
-                    item.avatar = userInfor.avatar;
-                    item.isOnline = userInfor.isOnline;
+                room.name = userInfor.fullName;
+                room.avatar = userInfor.avatar;
+                room.isOnline = userInfor.isOnline;
+            }
+
+            const myInfor = chatParticipal.userInformations.find((infor) => infor.userId === idFromToken);
+            const { lastTimeReading } = myInfor;
+
+            const lastMessenger = await this.messengerModel
+                .findOne({ chatRoomId: item._id })
+                .sort({ createdAt: -1 })
+                .exec();
+
+            if (lastMessenger) {
+                let userName = MY_NAME;
+
+                const { createdBy, createdAt, content } = lastMessenger;
+
+                if (room.isGroup && createdBy !== idFromToken) {
+                    const userInfor = await this.usersService.getDetail(createdBy);
+
+                    userName = userInfor.fullName;
                 }
 
-                const myInfor = chatParticipal.userInformations.find((infor) => infor.userId === idFromToken);
-                const { lastTimeReading } = myInfor;
+                room.lastMessengerInfor = {
+                    createdBy: createdBy,
+                    createdAt: createdAt,
+                    content: content,
+                    type: lastMessenger.type,
+                    info: lastMessenger.info,
+                    userName,
+                    hasRead: new Date(lastTimeReading).getTime() > new Date(createdAt).getTime(),
+                };
+            }
 
-                const lastMessenger = await this.messengerModel
-                    .findOne({ chatRoomId: room.id })
-                    .sort({ createdAt: -1 })
-                    .exec();
-
-                if (lastMessenger) {
-                    let userName = MY_NAME;
-
-                    if (room.isGroup && lastMessenger.createdBy !== idFromToken) {
-                        const userInfor = await this.usersService.getDetail(lastMessenger.createdBy);
-
-                        userName = userInfor.fullName;
-                    }
-                    item.lastMessengerInfor = {
-                        createdBy: lastMessenger.createdBy,
-                        createdAt: lastMessenger.createdAt,
-                        content: lastMessenger.content,
-                        type: lastMessenger.type,
-                        info: lastMessenger.info,
-                        userName,
-                        hasRead: new Date(lastMessenger.createdAt).getTime() <= new Date(lastTimeReading).getTime(),
-                    };
-                }
-
-                result.push(item);
-            }),
-        );
+            result.push(room);
+        }))
 
         return result;
     }
@@ -275,7 +289,7 @@ export class ChatRoomsService {
         return chatParticipals[0]?.chatRooms[0]._id;
     }
 
-    async getPrivateChatRoom(userId:string){
+    async getPrivateChatRoom(userId: string) {
         await this.usersService.getDetail(userId);
 
         const chatParticipals = await this.chatParticipalModel.aggregate([
@@ -299,7 +313,7 @@ export class ChatRoomsService {
                 },
             },
             {
-                $project: { chatRoomObjId: { $toObjectId: '$chatRoomId' } , infors: "$userInformations" },
+                $project: { chatRoomObjId: { $toObjectId: '$chatRoomId' }, infors: "$userInformations" },
             },
             {
                 $lookup: {
@@ -318,9 +332,23 @@ export class ChatRoomsService {
             },
         ]);
 
-        return chatParticipals.map((i) =>({
+        return chatParticipals.map((i) => ({
             chatRoomId: i.chatRoomObjId,
-            userId:  i.infors.find(infor => infor.userId !== userId)?.userId
+            userId: i.infors.find(infor => infor.userId !== userId)?.userId
         }))
+    }
+
+    async updateLastTimeReading(chatRoomId: string, idFromToken: string) {
+        const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(chatRoomId, idFromToken);
+
+        const temp = [...chatParticipal.userInformations]
+        const userInfor = temp.find(infor => infor.userId == idFromToken)
+        userInfor.lastTimeReading = Date.now()
+
+        await chatParticipal.update({
+            userInformations: temp
+        })
+
+        return chatParticipal
     }
 }

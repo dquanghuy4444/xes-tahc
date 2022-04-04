@@ -78,7 +78,7 @@ export class ChatRoomDescriptionResponse extends ChatRoomResponse {
 
     constructor(chatRoom: ChatRoom) {
         super(chatRoom);
-
+        this.id = chatRoom._id
         this.lastMessengerInfor = null;
     }
 }

@@ -38,6 +38,11 @@ export class ChatRoomsController {
         return this.chatRoomsService.getPrivateChatRoom(userId);
     }
 
+    @Put(':id/me/last-time-reading')
+    updateLastTimeReading(@IdFromToken() idFromToken: string, @Param('id') chatRoomId: string) {
+        return this.chatRoomsService.updateLastTimeReading(chatRoomId, idFromToken);
+    }
+
     @Put(':id')
     update(@IdFromToken() idFromToken: string, @Param('id') chatRoomId: string, @Body() updateRoomReq: UpdateRoomReq) {
         return this.chatRoomsService.update(chatRoomId, updateRoomReq, idFromToken);
