@@ -3,6 +3,7 @@ export const ChatRoomApiPath = new (function(){
         (this.myChatRoom = `${this.index}/me`),
         (this.myChatRoomBySearch = (search) => `${this.myChatRoom}/${search}`),
         (this.ourChatRoom = (id) => `${this.myChatRoom}/user/${id}`),
+        (this.lastTimeReading = (id) => `${this.index}/${id}/me/last-time-reading`),
         (this.chatRoomDetail = (id) => `${this.index}/${id}`),
         (this.member = (id) => `${this.index}/${id}/member`)
 })()

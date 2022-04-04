@@ -7,7 +7,7 @@ import Avatar from "@mui/material/Avatar"
 import { blue } from "@mui/material/colors"
 import { SOCKET_EVENT_NAMES } from "configs"
 import { ChatRoomApiPath } from "configs/api-paths"
-import { fetchData } from "helper"
+import { fetchData , putData } from "helper"
 import useFetchDataNoSave from "hooks/useFetchDataNoSave"
 import useSocketOn from "hooks/useSocketOn"
 import { useParams, useNavigate } from "react-router-dom"
@@ -30,6 +30,8 @@ const Sidebar = ({ className }) => {
     const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
     const chatRoomDescriptions = useStore((state) => state.chatRoomDescriptions)
     const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
+
+    console.log(chatRoomDescriptions);
 
     useFetchDataNoSave(
         ChatRoomApiPath.myChatRoom,
@@ -59,6 +61,7 @@ const Sidebar = ({ className }) => {
     useSocketOn(
         SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION,
         async(data) => {
+            console.log(data)
             const { lastMessengerInfor } = data
 
             if (
@@ -84,6 +87,16 @@ const Sidebar = ({ className }) => {
             }
 
             setChatRoomDescriptions([data])
+
+            setChatRoomDescriptions([
+                {
+                    ...data,
+                    lastMessengerInfor: {
+                        ...data.lastMessengerInfor,
+                        hasRead: chatRoomInfor.id === data.id
+                    }
+                }
+            ])
 
             if (chatRoomInfor?.id !== data.id){
                 return
@@ -118,14 +131,12 @@ const Sidebar = ({ className }) => {
     )
 
     useSocketOn(SOCKET_EVENT_NAMES.SERVER_SOCKET.STATUS_USER, async(data) => {
-        setChatRoomDescriptions(
-            [
-                {
-                    id       : data.chatRoomId,
-                    isOnline : data.isOnline
-                }
-            ]
-        )
+        setChatRoomDescriptions([
+            {
+                id       : data.chatRoomId,
+                isOnline : data.isOnline
+            }
+        ])
 
         if (chatRoomInfor?.id !== data.chatRoomId){
             return
@@ -135,6 +146,47 @@ const Sidebar = ({ className }) => {
             isOnline: data.isOnline
         })
     })
+
+    const showChatRoomDescriptions = () => {
+        if (chatRoomDescriptions?.length === 0){
+            return (
+                <p className="text-center mt-4 font-semibold text-lg">
+                    Bạn chưa có cuộc hội thoại nào
+                </p>
+            )
+        }
+
+        const handleRedirectToChatRoom = (chatRoomId) => {
+            navigate(`/room/${chatRoomId}`, { replace: true })
+
+            putData(ChatRoomApiPath.lastTimeReading(chatRoomId))
+
+            const temp = chatRoomDescriptions.find((desc) => desc.id === chatRoomId)
+            if(temp?.lastMessengerInfor?.hasRead === false){
+                setChatRoomDescriptions([
+                    {
+                        id                 : chatRoomId,
+                        lastMessengerInfor : {
+                            ...temp.lastMessengerInfor,
+                            hasRead: true
+                        }
+                    }
+                ])
+            }
+        }
+
+        return chatRoomDescriptions.map((item) => (
+            <ChatRoomCard
+                info={ item }
+                isActive={ item.id === id }
+                key={ item.id }
+                roomIsGroup={ item.isGroup }
+                roomIsOnline={ item.isOnline }
+                userInfors={ chatRoomInfor?.userInfors || [] }
+                onClick={ () => handleRedirectToChatRoom(item.id) }
+            />
+        ))
+    }
 
     return (
         <>
@@ -158,24 +210,7 @@ const Sidebar = ({ className }) => {
                     <SearchChatRoomInput />
                 </div>
 
-                <div className="overflow-auto px-4 pb-2 ">
-                    { chatRoomDescriptions?.length > 0 ? (
-                        chatRoomDescriptions.map((item) => (
-                            <ChatRoomCard
-                                info={ item }
-                                isActive={ item.id === id }
-                                key={ item.id }
-                                roomIsGroup={ item.isGroup }
-                                roomIsOnline={ item.isOnline }
-                                userInfors={ chatRoomInfor?.userInfors || [] }
-                            />
-                        ))
-                    ) : (
-                        <p className="text-center mt-4 font-semibold text-lg">
-                            Bạn chưa có cuộc hội thoại nào
-                        </p>
-                    ) }
-                </div>
+                <div className="overflow-auto px-4 pb-2 ">{ showChatRoomDescriptions() }</div>
             </section>
         </>
     )

@@ -8,12 +8,10 @@ import Avatar from "@mui/material/Avatar"
 import AvatarWithOnline from "components/AvatarWithOnline"
 import { MY_NAME } from "configs"
 import moment from "moment"
-import { useNavigate } from "react-router-dom"
 
-const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup , roomIsOnline }) => {
-    const { lastMessengerInfor, avatar, name, id } = info
+const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup , roomIsOnline , onClick}) => {
+    const { lastMessengerInfor, avatar, name } = info
 
-    const navigate = useNavigate()
 
     const getTimePeriodToPresent = () => {
         if (!lastMessengerInfor){
@@ -39,9 +37,6 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup , roomIsOnline }
         return <p className="text-xs text-quinary">{ str }</p>
     }
 
-    const handleRedirectToChatRoom = () => {
-        navigate(`/room/${id}`, { replace: true })
-    }
 
     const getContentLastMessenger = () => {
         if (!lastMessengerInfor){
@@ -82,7 +77,7 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup , roomIsOnline }
             className={ `flex cursor-pointer p-2 rounded-md items-center ${
                 isActive ? "bg-hover" : "hover:bg-hover"
             }` }
-            onClick={ handleRedirectToChatRoom }
+            onClick={ onClick }
         >
             <div className="relative">
                 { roomIsGroup ? (
