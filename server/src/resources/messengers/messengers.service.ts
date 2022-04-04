@@ -1,19 +1,21 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { CreateMessengerReq, CreateMessengerByFilesReq , MessengerResponse } from './dto/messengers.dto';
+import { CreateMessengerReq, CreateMessengerByFilesReq, MessengerResponse } from './dto/messengers.dto';
 import { ChatRoom } from 'resources/chat-rooms/entities/chat-room.entity';
-import { ENUM_MESSAGE_TYPE, Messenger } from './entities/messenger.entity';
+import { ENUM_MESSAGE_TYPE, MessageAttachment, Messenger } from './entities/messenger.entity';
 import { ChatParticipalsService } from 'resources/chat-participals/chat-participals.service';
+import { FilesService } from 'resources/files/files.service';
 
 @Injectable()
 export class MessengersService {
     constructor(
         private readonly chatParticipalsService: ChatParticipalsService,
+        private readonly filesService: FilesService,
 
         @InjectModel(ChatRoom.name) private chatRoomModel: Model<ChatRoom>,
         @InjectModel(Messenger.name) private messengerModel: Model<Messenger>,
-    ) {}
+    ) { }
 
     async create(createMessengerReq: CreateMessengerReq, idFromToken: string) {
         const { chatRoomId, type } = createMessengerReq;
@@ -31,6 +33,10 @@ export class MessengersService {
 
         if (type === ENUM_MESSAGE_TYPE.INFO && createMessengerReq.info) {
             doc.info = createMessengerReq.info;
+        }
+
+        if (type === ENUM_MESSAGE_TYPE.IMAGE && createMessengerReq.attachments) {
+            doc.attachments = createMessengerReq.attachments
         }
 
         const result = await this.messengerModel.create({
@@ -53,6 +59,25 @@ export class MessengersService {
         files: Express.Multer.File[],
         idFromToken: string,
     ) {
-        console.log(files);
+        const attachments: MessageAttachment[] = []
+
+        await Promise.all(
+            files.map(async (file) => {
+                const urlImage = await this.filesService.uploadFile(file)
+                attachments.push({
+                    name: urlImage,
+                    path: urlImage,
+                })
+            })
+        )
+
+        const result = await this.create({
+            chatRoomId: createMessengerByFilesReq.chatRoomId,
+            content: "",
+            type: ENUM_MESSAGE_TYPE.IMAGE,
+            attachments
+        }, idFromToken)
+
+        return result
     }
 }

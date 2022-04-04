@@ -20,6 +20,7 @@ import { ChatScheduleModule } from 'events/chat-schedule/chat-schedule.module';
 import redisStore from 'cache-manager-ioredis';
 import { HttpCacheInterceptor } from 'interceptors/http-cache.interceptor';
 import { ChatParticipalsModule } from './resources/chat-participals/chat-participals.module';
+import { FilesModule } from './resources/files/files.module';
 
 mongoose.set('debug', getEnv(ENUM_ENVIRONMENT_VARIABLE.NODE_ENV) === "dev");
 
@@ -46,6 +47,8 @@ mongoose.set('debug', getEnv(ENUM_ENVIRONMENT_VARIABLE.NODE_ENV) === "dev");
         ChatCalendarsModule,
 
         ChatParticipalsModule,
+
+        FilesModule,
 
         // CacheModule.registerAsync({
         //     useFactory: () => ({

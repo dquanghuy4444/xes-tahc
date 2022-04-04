@@ -39,10 +39,10 @@ export function FastifyFilesInterceptor(
         ) {
             this.multer = (FastifyMulter as any)({
                 ...options,
-                storage: diskStorage({
-                    // destination: './uploads',
-                    filename: editFileName,
-                }),
+                // storage: diskStorage({
+                //     // destination: './uploads',
+                //     filename: editFileName,
+                // }),
                 fileFilter: imageFileFilter,
                 ...localOptions,
             });

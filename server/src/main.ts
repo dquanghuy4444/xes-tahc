@@ -10,17 +10,24 @@ import { contentParser } from 'fastify-multer';
 import secureSession from 'fastify-secure-session';
 import { fastifyHelmet } from 'fastify-helmet';
 import { ValidationPipe } from '@nestjs/common';
+import { config } from 'aws-sdk';
 
 async function bootstrap() {
+    config.update({
+        accessKeyId: getEnv(ENUM_ENVIRONMENT_VARIABLE.AWS_ACCESS_KEY_ID),
+        secretAccessKey: getEnv(ENUM_ENVIRONMENT_VARIABLE.AWS_SECRET_ACCESS_KEY),
+        region: getEnv(ENUM_ENVIRONMENT_VARIABLE.AWS_REGION),
+    });
+
     const app = await NestFactory.create<NestFastifyApplication>(
         AppModule,
         new FastifyAdapter({ logger: getEnv(ENUM_ENVIRONMENT_VARIABLE.NODE_ENV) === 'dev' }),
     );
     app.setGlobalPrefix('v1');
-    
-    const config = new DocumentBuilder().setTitle('NestJS Auth').setDescription('').setVersion('1.0').build();
 
-    const document = SwaggerModule.createDocument(app, config);
+    const configSwagger = new DocumentBuilder().setTitle('NestJS Auth').setDescription('').setVersion('1.0').build();
+
+    const document = SwaggerModule.createDocument(app, configSwagger);
 
     SwaggerModule.setup('/', app, document);
 

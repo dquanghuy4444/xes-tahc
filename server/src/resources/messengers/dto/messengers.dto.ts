@@ -14,6 +14,9 @@ export class CreateMessengerReq {
 
     @IsOptional()
     info?: MessageInfo;
+
+    @IsOptional()
+    attachments?: MessageAttachment[];
 }
 
 export class CreateMessengerByFilesReq {
@@ -27,7 +30,7 @@ export class MessengerResponse {
     chatRoomId: string;
     createdBy: string;
     content?: string;
-    attachment?: MessageAttachment;
+    attachments?: MessageAttachment[];
     info?: MessageInfo;
     createdAt: Date;
 
@@ -37,7 +40,7 @@ export class MessengerResponse {
         this.chatRoomId = messenger.chatRoomId;
         this.createdBy = messenger.createdBy;
         this.content = messenger.content;
-        this.attachment = messenger.attachment;
+        this.attachments = messenger.attachments;
         this.info = messenger.info;
         this.createdAt = messenger.createdAt;
     }

@@ -5,9 +5,11 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { ChatRoomSchema , ChatRoom } from 'resources/chat-rooms/entities/chat-room.entity';
 import { Messenger, MessengerSchema } from './entities/messenger.entity';
 import { ChatParticipalsModule } from 'resources/chat-participals/chat-participals.module';
+import { FilesModule } from 'resources/files/files.module';
 
 @Module({
     imports: [
+        FilesModule,
         ChatParticipalsModule,
         MongooseModule.forFeature([{ name: ChatRoom.name, schema: ChatRoomSchema }]),
         MongooseModule.forFeature([{ name: Messenger.name, schema: MessengerSchema }]),

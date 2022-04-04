@@ -36,7 +36,7 @@ export class Messenger extends Document {
     @Prop()
     content?: string;
     @Prop()
-    attachment?: MessageAttachment;
+    attachments?: MessageAttachment[];
     @Prop()
     info?: MessageInfo;
     @Prop({ type: Date, default: Date.now })
