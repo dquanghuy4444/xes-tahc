@@ -45,6 +45,19 @@ const Input = () => {
             })
 
             if (mess){
+                socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+                    ...mess,
+                    userIds     : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
+                    userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
+                    senderInfor : myInfor,
+                    chatRoom    : {
+                        id      : chatRoomInfor.id,
+                        name    : chatRoomInfor.name,
+                        avatar  : chatRoomInfor.avatar,
+                        isGroup : chatRoomInfor.isGroup
+                    }
+                })
+
                 setFiles([])
             }
         }
@@ -133,25 +146,27 @@ const Input = () => {
         }
 
         return (
-            <div className="w-full absolute bottom-full left-0 bg-white px-4 pb-2 pt-4 border-border border-t-2 flex space-x-4">
-                { files.map((f) => {
-                    const objectUrl = URL.createObjectURL(f.file)
+            <div className="absolute bottom-full left-0 bg-white border-border border-t-2 w-full">
+                <div className="flex space-x-4 overflow-x-auto px-4 pb-2 pt-4 snap-mandatory scroll-smooth snap-x flex-nowrap w-full">
+                    { files.map((f) => {
+                        const objectUrl = URL.createObjectURL(f.file)
 
-                    return (
-                        <div className="relative" key={ f.id }>
-                            <div className="rounded-lg overflow-hidden shadow">
-                                <img className="h-[68px] w-full" src={ objectUrl } />
-                            </div>
+                        return (
+                            <div className="relative" key={ f.id }>
+                                <div className="rounded-lg overflow-hidden shadow w-max	">
+                                    <img className="h-[68px] w-full" src={ objectUrl } />
+                                </div>
 
-                            <div
-                                className="absolute -right-1 -top-1 rounded-full	bg-white shadow-secondary w-5 h-5 flex-center cursor-pointer"
-                                onClick={ () => handleRemoveFile(f.id) }
-                            >
-                                <CloseIcon sx={ { fontSize: 16 } } />
+                                <div
+                                    className="absolute -right-1 -top-1 rounded-full bg-white shadow-secondary w-5 h-5 flex-center cursor-pointer"
+                                    onClick={ () => handleRemoveFile(f.id) }
+                                >
+                                    <CloseIcon sx={ { fontSize: 16 } } />
+                                </div>
                             </div>
-                        </div>
-                    )
-                }) }
+                        )
+                    }) }
+                </div>
             </div>
         )
     }

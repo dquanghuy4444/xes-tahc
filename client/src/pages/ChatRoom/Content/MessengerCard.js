@@ -6,12 +6,12 @@ import Box from "@mui/material/Box"
 import { blue, teal } from "@mui/material/colors"
 import { MY_NAME } from "configs"
 
-export default function MessengerCard({ userInfor, content, type, info, createdBy }){
+export default function MessengerCard({ userInfor, content, type, info, attachments, createdBy }){
     const showContent = () => {
         if (type === ENUM_MESSAGE_TYPE.TEXT){
             return (
                 <Box
-                    className={ `rounded-3xl py-2 px-4 w-fit max-w-[48%] text-overflow ${
+                    className={ `rounded-3xl py-2 px-4 w-fit max-w-2/3 tablet:max-w-[48%] text-overflow ${
                         userInfor?.isMe ? `ml-auto mr-0 text-white` : ""
                     }` }
                     sx={ { bgcolor: userInfor?.isMe ? blue["A400"] : teal[50] } }
@@ -49,6 +49,21 @@ export default function MessengerCard({ userInfor, content, type, info, createdB
                     <p className="text-[15px] text-overflow text-quinary text-sm leading-5 text-center">
                         { str + content }
                     </p>
+                </Box>
+            )
+        }
+        if (type === ENUM_MESSAGE_TYPE.IMAGE){
+            return (
+                <Box
+                    className={ `py-1 max-w-2/3 laptop:max-w-[48%] flex gap-2 flex-wrap ${
+                        userInfor?.isMe ? `ml-auto mr-0 justify-end` : ""
+                    }` }
+                >
+                    { attachments.map((att) => (
+                        <div className="rounded-lg overflow-hidden w-max" key={ att.path }>
+                            <img alt={ "" } className=" h-[68px] tablet:h-[88px] w-full" src={ att.path } />
+                        </div>
+                    )) }
                 </Box>
             )
         }

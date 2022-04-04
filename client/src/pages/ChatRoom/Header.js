@@ -20,7 +20,7 @@ const Header = () => {
 
     return (
         <div className="border-border border-b-2 min-h-[64px] px-6 flex items-center">
-            <div className={ `h-full w-8 tablet:hidden` } onClick={ handleRedirectToDashboard }>
+            <div className={ `h-full w-8 tablet:hidden cursor-pointer` } onClick={ handleRedirectToDashboard }>
                 <ArrowBackIcon />
             </div>
 
