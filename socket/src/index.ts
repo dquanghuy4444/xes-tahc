@@ -94,8 +94,8 @@ io.on('connection', (socket) => {
 
 	socket.on(
 		SOCKET_EVENT_NAMES.CLIENT.JOIN_ROOM,
-		({ roomId, userId }: IJoinRoomReq) => {
-			joinRoom(roomId, userId);
+		async({ roomId, userId }: IJoinRoomReq) => {
+			await joinRoom(roomId, userId);
 		},
 	);
 

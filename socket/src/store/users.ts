@@ -4,50 +4,58 @@ import { IUser } from '../interfaces';
 const users: IUser[] = [];
 
 const addUser = async(id: string, socketId: string, roomId: string) => {
-	const existingUser = users.find(
-		(user) => user.roomId === roomId && user.id === id,
-	);
+    const existingUser = users.find(
+        (user) => user.roomId === roomId && user.id === id,
+    );
 
-	if (existingUser) {
-		return { error: 'Username is taken' };
-	}
+    if (existingUser) {
+        return { error: 'Username is taken' };
+    }
 
-	const user = { id, socketId, roomId };
+    const user = { id, socketId, roomId };
 
-	users.push(user);
+    users.push(user);
 
-	await putData('users/status', {
-		id,
-		isOnline: true,
-	});
+    await putData('users/status', {
+        id,
+        isOnline: true,
+    });
 };
 
 const removeUser = async(socketId: string) => {
-	const index = users.findIndex((user) => user.socketId === socketId);
+    const index = users.findIndex((user) => user.socketId === socketId);
 
-	if (index !== -1) {
-		const { id } = users[index];
-		await putData('users/status', {
-			id,
-			isOnline: false,
-		});
+    if (index !== -1) {
+        const { id } = users[index];
+        await putData('users/status', {
+            id,
+            isOnline: false,
+        });
+        const roomId = users[index]?.roomId || ""
+        if (roomId) {
+            const res = await putData(`chat-rooms/${roomId}/me/last-time-reading`);
 
-		users.splice(index, 1);
+            console.log(res)
+        }
+
+        users.splice(index, 1);
 
         return id
-	}
+    }
 };
 
 const getUser = (id: string) => users.find((user) => user.id === id);
 
-const joinRoom = (roomId: string, userId: string) => {
-	const user = getUser(userId);
-	if (user) {
-		user.roomId = roomId;
-	}
+const joinRoom = async(roomId: string, userId: string) => {
+    const user = getUser(userId);
+    if (user) {
+        user.roomId = roomId;
+        await putData(`chat-rooms/${roomId}/me/last-time-reading`);
+
+    }
 };
 
 const getUsersInRoom = (roomId: string) =>
-	users.filter((user) => user.roomId === roomId);
+    users.filter((user) => user.roomId === roomId);
 
 export { addUser, removeUser, getUser, getUsersInRoom, joinRoom };

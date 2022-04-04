@@ -21,11 +21,9 @@ const fetchData = async(path: string, payload: any = null) => {
 	}
 };
 
-const putData = async(path, data) => {
+const putData = async(path: string, data:any = null) => {
 	try {
-		const response = await axios.put(path, {
-			...data,
-		});
+		const response = await axios.put(path, {...data});
 
 		return handleTransformResponse(response);
 	} catch (ex) {
