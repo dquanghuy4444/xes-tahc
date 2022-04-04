@@ -25,54 +25,74 @@ const Input = () => {
     const socket = useStore((state) => state.socket)
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const myInfor = useStore((state) => state.myInfor)
+    const setMessengers = useStore((state) => state.setMessengers)
 
     const [message, setMessage] = useState("")
     const [files, setFiles] = useState([])
     const [isFocused, setIsFocused] = useState(true)
     const [isEmojiDisplayed, setIsEmojiDisplayed] = useState(false)
 
+    const sendFilesToServer = async(images, messId) => {
+        const formData = new FormData()
+        formData.append("chatRoomId", id)
+        images.forEach((f) => {
+            formData.append("files", f.file)
+        })
+
+        const mess = await postData(MessengerApiPath.sendFiles, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        })
+
+        socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+            ...mess,
+            messId,
+            userIds     : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
+            userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
+            senderInfor : myInfor,
+            chatRoom    : {
+                id      : chatRoomInfor.id,
+                name    : chatRoomInfor.name,
+                avatar  : chatRoomInfor.avatar,
+                isGroup : chatRoomInfor.isGroup
+            }
+        })
+    }
+
     const handleSendMessage = async() => {
         if (files.length > 0){
             const messId = uuidv4()
 
-            socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
-                content     : "",
-                type        : ENUM_MESSAGE_TYPE.IMAGE,
-                chatRoomId  : id,
-                id          : messId,
-                messId,
-                attachments : files.map((file) => ({
-                    name : uuidv4(),
-                    path : ""
-                })),
-                createdBy : myInfor.id,
-                userIds   : chatRoomInfor.userInfors
-                    .filter((info) => info.stillIn)
-                    .map((info) => info.id),
-                userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
-                senderInfor : myInfor,
-                chatRoom    : {
-                    id      : chatRoomInfor.id,
-                    name    : chatRoomInfor.name,
-                    avatar  : chatRoomInfor.avatar,
-                    isGroup : chatRoomInfor.isGroup
+            setMessengers([
+                {
+                    content     : "",
+                    type        : ENUM_MESSAGE_TYPE.IMAGE,
+                    chatRoomId  : id,
+                    id          : messId,
+                    messId,
+                    attachments : files.map((file) => ({
+                        name : uuidv4(),
+                        path : ""
+                    })),
+                    createdBy : myInfor.id,
+                    userIds   : chatRoomInfor.userInfors
+                        .filter((info) => info.stillIn)
+                        .map((info) => info.id),
+                    userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
+                    senderInfor : myInfor,
+                    chatRoom    : {
+                        id      : chatRoomInfor.id,
+                        name    : chatRoomInfor.name,
+                        avatar  : chatRoomInfor.avatar,
+                        isGroup : chatRoomInfor.isGroup
+                    }
                 }
-            })
+            ])
+
+            sendFilesToServer(files, messId)
 
             setFiles([])
-
-            const formData = new FormData()
-            formData.append("chatRoomId", id)
-            formData.append("messId", messId)
-            files.forEach((f) => {
-                formData.append("files", f.file)
-            })
-
-            const res = await postData(MessengerApiPath.sendFiles, formData, {
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
-            })
         }
 
         if (!message){
@@ -159,19 +179,19 @@ const Input = () => {
         }
 
         return (
-            <div className="absolute bottom-full left-0 bg-white border-border border-t-2 w-full">
-                <div className="flex space-x-4 overflow-x-auto px-4 pb-2 pt-4 snap-mandatory scroll-smooth snap-x flex-nowrap w-full">
+            <div className="bottom-full border-border absolute left-0 w-full bg-white border-t-2">
+                <div className="snap-mandatory scroll-smooth snap-x flex-nowrap flex w-full px-4 pt-4 pb-2 space-x-4 overflow-x-auto">
                     { files.map((f) => {
                         const objectUrl = URL.createObjectURL(f.file)
 
                         return (
                             <div className="relative" key={ f.id }>
-                                <div className="rounded-lg overflow-hidden shadow w-max	">
+                                <div className="w-max overflow-hidden rounded-lg shadow">
                                     <img alt={ "" } className="h-[68px] w-full" src={ objectUrl } />
                                 </div>
 
                                 <div
-                                    className="absolute -right-1 -top-1 rounded-full bg-white shadow-secondary w-5 h-5 flex-center cursor-pointer"
+                                    className="-right-1 -top-1 shadow-secondary flex-center absolute w-5 h-5 bg-white rounded-full cursor-pointer"
                                     onClick={ () => handleRemoveFile(f.id) }
                                 >
                                     <CloseIcon sx={ { fontSize: 16 } } />

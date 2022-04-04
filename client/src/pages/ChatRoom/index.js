@@ -1,4 +1,4 @@
-import { ENUM_STATUS_SET_STATE_ZUSTAND, ENUM_MESSAGE_INFO_TYPE } from "constants"
+import { ENUM_STATUS_SET_STATE_ZUSTAND, ENUM_MESSAGE_INFO_TYPE, ENUM_MESSAGE_TYPE } from "constants"
 
 import React, { useEffect } from "react"
 
@@ -22,6 +22,7 @@ const ChatRoom = () => {
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const setChatRoomInfor = useStore((state) => state.setChatRoomInfor)
     const setMessengers = useStore((state) => state.setMessengers)
+    const messengers = useStore((state) => state.messengers)
 
     useFetchDataNoSave(
         MessengerApiPath.messengersInRoom(id),
@@ -70,12 +71,24 @@ const ChatRoom = () => {
         ){
             return
         }
-        console.log(data)
+
+        if (data.type === ENUM_MESSAGE_TYPE.IMAGE){
+            const temp = [...messengers]
+            const mess = temp.find((i) => i.messId === data.messId)
+            if(mess){
+                mess.attachments = data.attachments
+                setMessengers(temp, ENUM_STATUS_SET_STATE_ZUSTAND.ADD_NEW)
+
+                return
+
+            }
+
+        }
         setMessengers([data])
     })
 
     return (
-        <div className="h-full chat-room">
+        <div className="chat-room h-full">
             { chatRoomInfor ? (
                 <>
                     <Header />
@@ -83,7 +96,7 @@ const ChatRoom = () => {
                     <Content />
                 </>
             ) : (
-                <div className="w-full h-full flex-center flex-col space-y-6 px-10">
+                <div className="flex-center flex-col w-full h-full px-10 space-y-6">
                     <ChatIcon sx={ { fontSize: 120 } } />
 
                     <p className="text-xl font-semibold text-center">
