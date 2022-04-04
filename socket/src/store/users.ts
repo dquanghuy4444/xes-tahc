@@ -33,9 +33,7 @@ const removeUser = async(socketId: string) => {
         });
         const roomId = users[index]?.roomId || ""
         if (roomId) {
-            const res = await putData(`chat-rooms/${roomId}/me/last-time-reading`);
-
-            console.log(res)
+            await putData(`chat-rooms/${roomId}/me/last-time-reading`);
         }
 
         users.splice(index, 1);

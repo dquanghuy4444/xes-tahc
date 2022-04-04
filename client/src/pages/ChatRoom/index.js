@@ -70,6 +70,7 @@ const ChatRoom = () => {
         ){
             return
         }
+        console.log(data)
         setMessengers([data])
     })
 

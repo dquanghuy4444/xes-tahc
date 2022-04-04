@@ -35,6 +35,7 @@ const Content = () => {
         }))
     }, [roomInfor, messengers])
 
+
     return (
         <div className="h-full flex flex-col chat">
             <div className="content-chat overflow-auto mb-2">

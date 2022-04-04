@@ -33,51 +33,58 @@ const Input = () => {
 
     const handleSendMessage = async() => {
         if (files.length > 0){
+            const messId = uuidv4()
+
+            socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+                content     : "",
+                type        : ENUM_MESSAGE_TYPE.IMAGE,
+                chatRoomId  : id,
+                id          : messId,
+                messId,
+                attachments : files.map((file) => ({
+                    name : uuidv4(),
+                    path : ""
+                })),
+                createdBy : myInfor.id,
+                userIds   : chatRoomInfor.userInfors
+                    .filter((info) => info.stillIn)
+                    .map((info) => info.id),
+                userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
+                senderInfor : myInfor,
+                chatRoom    : {
+                    id      : chatRoomInfor.id,
+                    name    : chatRoomInfor.name,
+                    avatar  : chatRoomInfor.avatar,
+                    isGroup : chatRoomInfor.isGroup
+                }
+            })
+
+            setFiles([])
+
             const formData = new FormData()
             formData.append("chatRoomId", id)
+            formData.append("messId", messId)
             files.forEach((f) => {
                 formData.append("files", f.file)
             })
-            const mess = await postData(MessengerApiPath.sendFiles, formData, {
+
+            const res = await postData(MessengerApiPath.sendFiles, formData, {
                 headers: {
                     "Content-Type": "multipart/form-data"
                 }
             })
-
-            if (mess){
-                socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
-                    ...mess,
-                    userIds     : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
-                    userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
-                    senderInfor : myInfor,
-                    chatRoom    : {
-                        id      : chatRoomInfor.id,
-                        name    : chatRoomInfor.name,
-                        avatar  : chatRoomInfor.avatar,
-                        isGroup : chatRoomInfor.isGroup
-                    }
-                })
-
-                setFiles([])
-            }
         }
 
         if (!message){
             return
         }
 
-        const mess = await postData(MessengerApiPath.index, {
-            content    : message,
-            type       : ENUM_MESSAGE_TYPE.TEXT,
-            chatRoomId : id
-        })
-
-        if (!mess){
-            return
-        }
-
         socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
-            ...mess,
+            content     : message,
+            type        : ENUM_MESSAGE_TYPE.TEXT,
+            chatRoomId  : id,
+            id          : uuidv4(),
+            createdBy   : myInfor.id,
             userIds     : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
             userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
             senderInfor : myInfor,
@@ -90,6 +97,12 @@ const Input = () => {
         })
 
         setMessage("")
+
+        postData(MessengerApiPath.index, {
+            content    : message,
+            type       : ENUM_MESSAGE_TYPE.TEXT,
+            chatRoomId : id
+        })
     }
 
     useEventListener("keypress", (e) => {
@@ -154,7 +167,7 @@ const Input = () => {
                         return (
                             <div className="relative" key={ f.id }>
                                 <div className="rounded-lg overflow-hidden shadow w-max	">
-                                    <img className="h-[68px] w-full" src={ objectUrl } />
+                                    <img alt={ "" } className="h-[68px] w-full" src={ objectUrl } />
                                 </div>
 
                                 <div

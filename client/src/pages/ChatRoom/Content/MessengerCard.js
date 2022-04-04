@@ -3,6 +3,7 @@ import { ENUM_MESSAGE_TYPE, ENUM_MESSAGE_INFO_TYPE } from "constants"
 import React from "react"
 
 import Box from "@mui/material/Box"
+import CircularProgress from '@mui/material/CircularProgress';
 import { blue, teal } from "@mui/material/colors"
 import { MY_NAME } from "configs"
 
@@ -60,8 +61,18 @@ export default function MessengerCard({ userInfor, content, type, info, attachme
                     }` }
                 >
                     { attachments.map((att) => (
-                        <div className="rounded-lg overflow-hidden w-max" key={ att.path }>
-                            <img alt={ "" } className=" h-[68px] tablet:h-[88px] w-full" src={ att.path } />
+                        <div className="rounded-lg overflow-hidden w-max" key={ att.name }>
+                            { att.path ? (
+                                <img
+                                    alt={ "" }
+                                    className=" h-[68px] tablet:h-[88px] w-full"
+                                    src={ att.path }
+                                />
+                            ) : (
+                                <div className="h-[68px] w-[68px] tablet:h-[88px] tablet:w-[88px] bg-border flex-center">
+                                    <CircularProgress color="inherit" />
+                                </div>
+                            ) }
                         </div>
                     )) }
                 </Box>

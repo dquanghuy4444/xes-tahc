@@ -9,9 +9,8 @@ import AvatarWithOnline from "components/AvatarWithOnline"
 import { MY_NAME } from "configs"
 import moment from "moment"
 
-const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup , roomIsOnline , onClick}) => {
+const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup, roomIsOnline, onClick }) => {
     const { lastMessengerInfor, avatar, name } = info
-
 
     const getTimePeriodToPresent = () => {
         if (!lastMessengerInfor){
@@ -37,7 +36,6 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup , roomIsOnline ,
         return <p className="text-xs text-quinary">{ str }</p>
     }
 
-
     const getContentLastMessenger = () => {
         if (!lastMessengerInfor){
             return "Chưa có tin nhắn nào"
@@ -48,6 +46,13 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup , roomIsOnline ,
                     ? `${lastMessengerInfor.userName} : `
                     : ""
             }${lastMessengerInfor.content}`
+        }
+        if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.IMAGE){
+            return `${
+                lastMessengerInfor.userName === MY_NAME || roomIsGroup
+                    ? `${lastMessengerInfor.userName} : `
+                    : ""
+            }đã tải hình ảnh`
         }
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.INFO){
             if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){

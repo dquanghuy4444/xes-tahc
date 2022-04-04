@@ -136,7 +136,7 @@ export class ChatRoomsService {
 
                 const { createdBy, createdAt, content } = lastMessenger;
 
-                if (room.isGroup && createdBy !== idFromToken) {
+                if (createdBy !== idFromToken) {
                     const userInfor = await this.usersService.getDetail(createdBy);
 
                     userName = userInfor.fullName;

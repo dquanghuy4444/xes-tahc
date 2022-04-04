@@ -31,8 +31,6 @@ const Sidebar = ({ className }) => {
     const chatRoomDescriptions = useStore((state) => state.chatRoomDescriptions)
     const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
 
-    console.log(chatRoomDescriptions);
-
     useFetchDataNoSave(
         ChatRoomApiPath.myChatRoom,
         (res) => {
@@ -61,7 +59,6 @@ const Sidebar = ({ className }) => {
     useSocketOn(
         SOCKET_EVENT_NAMES.SERVER_SOCKET.SEND_DATA_FOR_CHAT_ROOM_DESCRIPTION,
         async(data) => {
-            console.log(data)
             const { lastMessengerInfor } = data
 
             if (
