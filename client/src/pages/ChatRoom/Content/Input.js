@@ -14,13 +14,12 @@ import { MessengerApiPath } from "configs/api-paths"
 import Picker from "emoji-picker-react"
 import { postData } from "helper"
 import useEventListener from "hooks/useEventListener"
-import { useParams } from "react-router-dom"
 import { useStore } from "store"
 import buildFileSelector from "utils/build-file-selector"
 import { v4 as uuidv4 } from "uuid"
 
 const Input = () => {
-    const { id } = useParams()
+
 
     const socket = useStore((state) => state.socket)
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
@@ -34,7 +33,7 @@ const Input = () => {
 
     const sendFilesToServer = async(images, messId) => {
         const formData = new FormData()
-        formData.append("chatRoomId", id)
+        formData.append("chatRoomId", chatRoomInfor.id)
         images.forEach((f) => {
             formData.append("files", f.file)
         })
@@ -102,7 +101,7 @@ const Input = () => {
         socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
             content     : message,
             type        : ENUM_MESSAGE_TYPE.TEXT,
-            chatRoomId  : id,
+            chatRoomId  : chatRoomInfor.id,
             id          : uuidv4(),
             createdBy   : myInfor.id,
             userIds     : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
@@ -121,7 +120,7 @@ const Input = () => {
         postData(MessengerApiPath.index, {
             content    : message,
             type       : ENUM_MESSAGE_TYPE.TEXT,
-            chatRoomId : id
+            chatRoomId : chatRoomInfor.id
         })
     }
 
@@ -208,7 +207,7 @@ const Input = () => {
         <div className="relative">
             { showImageFilesWrapper() }
 
-            <div className="min-h-[60px] flex items-center space-x-3 px-4">
+            <div className="min-h-[60px] flex items-center space-x-3 p-4">
                 <InsertPhotoIcon
                     color="primary"
                     sx={ { cursor: "pointer" } }

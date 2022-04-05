@@ -13,12 +13,12 @@ export default function MessengerCard({ userInfor, content, type, info, attachme
         if (type === ENUM_MESSAGE_TYPE.TEXT){
             return (
                 <Box
-                    className={ `rounded-3xl py-2 px-4 w-fit max-w-2/3 tablet:max-w-[48%] text-overflow ${
+                    className={ `rounded-3xl py-2 px-4 w-fit max-w-2/3 tablet:max-w-[48%] ${
                         userInfor?.isMe ? `ml-auto mr-0 text-white` : ""
                     }` }
                     sx={ { bgcolor: userInfor?.isMe ? blue["A400"] : teal[50] } }
                 >
-                    <p className="text-[15px] text-overflow leading-5">{ content }</p>
+                    <p className="text-[15px] text-overflow text-wrap leading-5">{ content }</p>
                 </Box>
             )
         }
@@ -53,7 +53,7 @@ export default function MessengerCard({ userInfor, content, type, info, attachme
 
             return (
                 <Box className="py-1">
-                    <p className="text-[15px] text-overflow text-quinary text-sm leading-5 text-center">
+                    <p className="text-[15px] text-overflow text-wrap text-quinary text-sm leading-5 text-center">
                         { str + cont }
                     </p>
                 </Box>

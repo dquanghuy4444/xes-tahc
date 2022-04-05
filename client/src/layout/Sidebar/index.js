@@ -7,7 +7,7 @@ import Avatar from "@mui/material/Avatar"
 import { blue } from "@mui/material/colors"
 import { SOCKET_EVENT_NAMES } from "configs"
 import { ChatRoomApiPath } from "configs/api-paths"
-import { fetchData , putData } from "helper"
+import { fetchData, putData } from "helper"
 import useFetchDataNoSave from "hooks/useFetchDataNoSave"
 import useSocketOn from "hooks/useSocketOn"
 import { useParams, useNavigate } from "react-router-dom"
@@ -17,6 +17,8 @@ import { showNotification } from "utils"
 import ChatRoomCard from "./ChatRoomCard"
 import ModalCreateRoom from "./ModalCreateRoom"
 import SearchChatRoomInput from "./SearchChatRoomInput"
+import SkeletonChatRoomCard from "./SkeletonChatRoomCard"
+
 
 const Sidebar = ({ className }) => {
     const { id } = useParams()
@@ -160,9 +162,27 @@ const Sidebar = ({ className }) => {
     const showChatRoomDescriptions = useMemo(() => {
         if (chatRoomDescriptions?.length === 0){
             return (
-                <p className="text-center mt-4 font-semibold text-lg">
-                    Bạn chưa có cuộc hội thoại nào
-                </p>
+                <>
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+                </>
             )
         }
 
@@ -172,7 +192,7 @@ const Sidebar = ({ className }) => {
             putData(ChatRoomApiPath.lastTimeReading(chatRoomId))
 
             const temp = chatRoomDescriptions.find((desc) => desc.id === chatRoomId)
-            if(temp?.lastMessengerInfor?.hasRead === false){
+            if (temp?.lastMessengerInfor?.hasRead === false){
                 setChatRoomDescriptions([
                     {
                         id                 : chatRoomId,
@@ -196,7 +216,7 @@ const Sidebar = ({ className }) => {
                 onClick={ () => handleRedirectToChatRoom(item.id) }
             />
         ))
-    } , [chatRoomDescriptions , id])
+    }, [chatRoomDescriptions, id])
 
     return (
         <>

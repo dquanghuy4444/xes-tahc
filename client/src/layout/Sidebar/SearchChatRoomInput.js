@@ -8,20 +8,28 @@ import { fetchData } from "helper"
 import useDebounce from "hooks/useDebounce"
 import { useNavigate } from "react-router-dom"
 
+import SkeletonChatRoomCard from "./SkeletonChatRoomCard"
+
 export default function SearchChatRoomInput(){
     const navigate = useNavigate()
 
     const [search, setSearch] = useState("")
     const [isFocused, setIsFocused] = useState(false)
+    const [isLoading, setIsLoading] = useState(false)
     const [searchedRoomDescriptions, setSearchedRoomDescriptions] = useState([])
 
     const getSearchedRoomDescription = async(s) => {
         if (!isFocused){
             return
         }
+        setIsLoading(true)
+
         const res = await fetchData(ChatRoomApiPath.myChatRoomBySearch(s))
 
         setSearchedRoomDescriptions(res)
+
+        setIsLoading(false)
+
     }
 
     useDebounce(
@@ -39,7 +47,27 @@ export default function SearchChatRoomInput(){
 
     const showChatRoomDescriptions = () => {
         if (searchedRoomDescriptions.length === 0){
-            return <></>
+            return (
+                <p className="text-center mt-6">
+                    Không tìm thấy kết quả phù hợp
+                </p>
+            )
+        }
+
+        if(isLoading){
+            return (
+                <>
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+
+                    <SkeletonChatRoomCard />
+                </>
+            )
         }
 
         return searchedRoomDescriptions.map((desc) => {

@@ -16,7 +16,8 @@ export const ENUM_MESSAGE_INFO_TYPE = {
 
 export const ENUM_UPDATE_MEMBER_TYPE = {
     ADD    : "ADD",
-    REMOVE : "REMOVE"
+    REMOVE : "REMOVE",
+    CHANGE : "CHANGE"
 }
 
 export const ENUM_STATUS_SET_STATE_ZUSTAND = {

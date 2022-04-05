@@ -12,13 +12,10 @@ import TextField from "@mui/material/TextField"
 import { SOCKET_EVENT_NAMES } from "configs"
 import { ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
 import { putData, postData } from "helper"
-import { useParams } from "react-router-dom"
 import { useStore } from "store"
 import { showNotification } from "utils"
 
 export default function ModalChangeName({ open, setOpen }){
-    const { id } = useParams()
-
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const myInfor = useStore((state) => state.myInfor)
     const socket = useStore((state) => state.socket)
@@ -47,7 +44,7 @@ export default function ModalChangeName({ open, setOpen }){
             info    : {
                 type: ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP
             },
-            chatRoomId: id
+            chatRoomId: chatRoomInfor.id
         })
 
 

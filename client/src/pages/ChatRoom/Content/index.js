@@ -38,7 +38,7 @@ const Content = () => {
 
     return (
         <div className="h-full flex flex-col chat">
-            <div className="content-chat overflow-auto mb-2">
+            <div className="content-chat overflow-auto">
                 <div className=" px-4 flex flex-col justify-end space-y-2 mt-8">
                     <FirstMessenger />
 
