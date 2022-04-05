@@ -7,20 +7,23 @@ import { blue } from "@mui/material/colors"
 import AvatarWithOnline from "components/AvatarWithOnline"
 import { useNavigate } from "react-router-dom"
 import { useStore } from "store"
+import { getTimePeriodToPresent } from "utils/get-time-period-to-present"
 
 const Header = () => {
     const navigate = useNavigate()
 
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const setToggleInforBarDisplayed = useStore((state) => state.setToggleInforBarDisplayed)
-
     const handleRedirectToDashboard = () => {
         navigate("/", { replace: true })
     }
 
     return (
         <div className="border-border border-b-2 min-h-[64px] px-6 flex items-center">
-            <div className={ `h-full w-8 tablet:hidden cursor-pointer` } onClick={ handleRedirectToDashboard }>
+            <div
+                className={ `h-full w-8 tablet:hidden cursor-pointer` }
+                onClick={ handleRedirectToDashboard }
+            >
                 <ArrowBackIcon />
             </div>
 
@@ -31,7 +34,19 @@ const Header = () => {
                 sx={ { width: 48, height: 48 } }
             />
 
-            <p className="ml-4 font-semibold text-[19px]">{ chatRoomInfor?.name }</p>
+            <div className="ml-4">
+                <p className="font-semibold text-[19px]">{ chatRoomInfor?.name }</p>
+
+                {
+                    !chatRoomInfor?.isGroup && (
+                        <p className="text-sm text-quinary">
+                            {
+                                chatRoomInfor.isOnline ? "Đang hoạt động" : `Hoạt động ${getTimePeriodToPresent(chatRoomInfor?.lastTimeOnline)} trước`
+                            }
+                        </p>
+                    )
+                }
+            </div>
 
             { chatRoomInfor?.isGroup && (
                 <Avatar

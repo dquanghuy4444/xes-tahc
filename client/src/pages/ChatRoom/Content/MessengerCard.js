@@ -9,6 +9,7 @@ import { MY_NAME } from "configs"
 
 export default function MessengerCard({ userInfor, content, type, info, attachments, createdBy }){
     const showContent = () => {
+        let cont = content
         if (type === ENUM_MESSAGE_TYPE.TEXT){
             return (
                 <Box
@@ -30,6 +31,11 @@ export default function MessengerCard({ userInfor, content, type, info, attachme
             if (info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
                 str += " đã đổi tên nhóm thành "
             }
+
+            if (info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_AVATAR_GROUP){
+                str += " đã thay ảnh đại diện nhóm"
+                cont = ""
+            }
             if (info.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER){
                 str += ` đã thêm ${
                     info?.userInfor?.isMe ? MY_NAME : info?.userInfor?.fullName || "thành viên"
@@ -48,7 +54,7 @@ export default function MessengerCard({ userInfor, content, type, info, attachme
             return (
                 <Box className="py-1">
                     <p className="text-[15px] text-overflow text-quinary text-sm leading-5 text-center">
-                        { str + content }
+                        { str + cont }
                     </p>
                 </Box>
             )
@@ -70,7 +76,7 @@ export default function MessengerCard({ userInfor, content, type, info, attachme
                                 />
                             ) : (
                                 <div className="h-[68px] w-[68px] tablet:h-[88px] tablet:w-[88px] bg-border flex-center">
-                                    <CircularProgress color="inherit" />
+                                    <CircularProgress />
                                 </div>
                             ) }
                         </div>

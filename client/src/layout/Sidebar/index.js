@@ -1,6 +1,6 @@
 import { ENUM_MESSAGE_INFO_TYPE, ENUM_STATUS_SET_STATE_ZUSTAND } from "constants"
 
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 
 import AddIcon from "@mui/icons-material/Add"
 import Avatar from "@mui/material/Avatar"
@@ -83,7 +83,7 @@ const Sidebar = ({ className }) => {
                 return
             }
 
-            setChatRoomDescriptions([data])
+            // setChatRoomDescriptions([data])
 
             setChatRoomDescriptions([
                 {
@@ -103,7 +103,19 @@ const Sidebar = ({ className }) => {
                 setChatRoomInfor({
                     name: data.name
                 })
-            } else if (
+
+                return
+            }
+
+            if (lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_AVATAR_GROUP){
+                setChatRoomInfor({
+                    avatar: data.lastMessengerInfor.content
+                })
+
+                return
+            }
+
+            if (
                 lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER ||
                 lastMessengerInfor?.info?.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT
             ){
@@ -140,11 +152,12 @@ const Sidebar = ({ className }) => {
         }
 
         setChatRoomInfor({
-            isOnline: data.isOnline
+            isOnline       : data.isOnline,
+            lastTimeOnline : Date.now()
         })
     })
 
-    const showChatRoomDescriptions = () => {
+    const showChatRoomDescriptions = useMemo(() => {
         if (chatRoomDescriptions?.length === 0){
             return (
                 <p className="text-center mt-4 font-semibold text-lg">
@@ -183,7 +196,7 @@ const Sidebar = ({ className }) => {
                 onClick={ () => handleRedirectToChatRoom(item.id) }
             />
         ))
-    }
+    } , [chatRoomDescriptions , id])
 
     return (
         <>
@@ -207,7 +220,7 @@ const Sidebar = ({ className }) => {
                     <SearchChatRoomInput />
                 </div>
 
-                <div className="overflow-auto px-4 pb-2 ">{ showChatRoomDescriptions() }</div>
+                <div className="overflow-auto px-4 pb-2 ">{ showChatRoomDescriptions }</div>
             </section>
         </>
     )

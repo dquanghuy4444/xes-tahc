@@ -4,18 +4,21 @@ import React, { useState, useEffect } from "react"
 
 import AddIcon from "@mui/icons-material/Add"
 import ArrowBackIcon from "@mui/icons-material/ArrowBack"
+import InsertPhotoIcon from '@mui/icons-material/InsertPhoto';
 import LogoutIcon from "@mui/icons-material/Logout"
 import ModeEditIcon from "@mui/icons-material/ModeEdit"
 import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
 import { Avatar } from "@mui/material"
 import ConfirmModal from "components/ConfirmModal"
 import { SOCKET_EVENT_NAMES } from "configs"
-import { ChatRoomApiPath, MessengerApiPath } from "configs/api-paths"
+import { ChatRoomApiPath, MessengerApiPath , FileApiPath } from "configs/api-paths"
 import { putData, postData } from "helper"
 import ModalAddMember from "pages/ChatRoom/Content/FirstMessenger/ModalAddMember"
 import ModalChangeName from "pages/ChatRoom/Content/FirstMessenger/ModalChangeName"
 import ModalShowMembers from "pages/ChatRoom/Content/FirstMessenger/ModalShowMembers"
 import { useStore } from "store"
+import { showNotification } from "utils"
+import buildFileSelector from "utils/build-file-selector"
 
 const NavItem = ({ onClick, icon, children, className = "" }) => {
     return (
@@ -95,6 +98,60 @@ const InformationBar = ({ className }) => {
             }
         })
     }
+    const cbSelecteFiles = async(fileList) => {
+        if (fileList.length === 0){
+            return
+        }
+
+        const [file] = fileList
+
+        const formData = new FormData()
+        formData.append("file", file)
+
+        const res = await postData(FileApiPath.index, formData, {
+            headers: {
+                "Content-Type": "multipart/form-data"
+            }
+        })
+
+        await putData(ChatRoomApiPath.chatRoomDetail(id), {
+            avatar: res
+        })
+
+        const mess = await postData(MessengerApiPath.index, {
+            content : res,
+            type    : ENUM_MESSAGE_TYPE.INFO,
+            info    : {
+                type: ENUM_MESSAGE_INFO_TYPE.CHANGE_AVATAR_GROUP
+            },
+            chatRoomId: id
+        })
+
+
+        if (mess){
+            socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+                ...mess,
+                userIds     : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
+                senderInfor : myInfor,
+                chatRoom    : {
+                    isGroup : chatRoomInfor.isGroup,
+                    id      : chatRoomInfor.id,
+                    avatar  : res
+                }
+            })
+
+            showNotification("success", "Bạn đã thay ảnh đai diện thành công")
+        }
+
+    }
+
+    const fileSelector = buildFileSelector(cbSelecteFiles , false)
+
+    const handleChangeAvatar = (e) => {
+        e.preventDefault()
+        fileSelector.click()
+    }
+
 
     return (
         <>
@@ -134,6 +191,10 @@ const InformationBar = ({ className }) => {
 
                 <NavItem icon={ <PeopleAltIcon /> } onClick={ () => setOpenModalShowMembers(true) }>
                     Thành viên
+                </NavItem>
+
+                <NavItem icon={ <InsertPhotoIcon /> } onClick={ handleChangeAvatar }>
+                    Đổi ảnh đại diện
                 </NavItem>
 
                 <NavItem icon={ <ModeEditIcon /> } onClick={ () => setOpenModalChangeName(true) }>

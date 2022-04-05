@@ -7,37 +7,24 @@ import PeopleAltIcon from "@mui/icons-material/PeopleAlt"
 import Avatar from "@mui/material/Avatar"
 import AvatarWithOnline from "components/AvatarWithOnline"
 import { MY_NAME } from "configs"
-import moment from "moment"
+import { getTimePeriodToPresent } from "utils/get-time-period-to-present"
 
 const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup, roomIsOnline, onClick }) => {
     const { lastMessengerInfor, avatar, name } = info
 
-    const getTimePeriodToPresent = () => {
+    const showTimePeriodToPresent = () => {
         if (!lastMessengerInfor){
             return <></>
         }
 
         const { createdAt } = lastMessengerInfor
-        const duration = moment.duration(moment().diff(moment(createdAt)))
-        let time = Math.ceil(duration.asMinutes())
-
-        let str = `${time} phút`
-
-        if (time >= 60){
-            time = Math.ceil(duration.asHours())
-            str = `${time} giờ`
-        }
-
-        if (time >= 24){
-            time = Math.ceil(duration.asDays())
-            str = `${time} ngày`
-        }
+        const str = getTimePeriodToPresent(createdAt)
 
         return <p className="text-xs text-quinary">{ str }</p>
     }
 
     const getContentLastMessenger = () => {
-        if (!lastMessengerInfor){
+        if (!lastMessengerInfor?.type){
             return "Chưa có tin nhắn nào"
         }
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.TEXT){
@@ -57,6 +44,9 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup, roomIsOnline, o
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.INFO){
             if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_NAME_GROUP){
                 return `${lastMessengerInfor.userName} đã đổi tên nhóm`
+            }
+            if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.CHANGE_AVATAR_GROUP){
+                return `${lastMessengerInfor.userName} đã đổi ảnh đại diện nhóm`
             }
             if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.ADD_MEMBER){
                 return `${lastMessengerInfor.userName} đã thêm thành viên`
@@ -125,7 +115,7 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup, roomIsOnline, o
                         { getContentLastMessenger() }
                     </p>
 
-                    { getTimePeriodToPresent() }
+                    { showTimePeriodToPresent() }
                 </div>
             </div>
 

@@ -54,13 +54,17 @@ export class UsersService {
     }
 
     async updateOnlOffStatus(updateOnlOffStatusReq: IUpdateOnlOffStatusReq) {
-
+        const {isOnline , id} =updateOnlOffStatusReq
+        const update:any = {
+            isOnline
+        }
+        if(!isOnline){
+            update.lastTimeOnline = Date.now()
+        }
         const user = await this.userModel
             .findByIdAndUpdate(
-                updateOnlOffStatusReq.id,
-                {
-                    isOnline: updateOnlOffStatusReq.isOnline,
-                },
+                id,
+                update,
                 { new: true },
             )
             .exec();

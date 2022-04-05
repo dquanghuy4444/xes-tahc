@@ -81,6 +81,7 @@ export class ChatRoomsService {
             result.name = userInfors[0].fullName;
             result.avatar = userInfors[0].avatar;
             result.isOnline = userInfors[0].isOnline;
+            result.lastTimeOnline = userInfors[0].lastTimeOnline;
         }
 
         return result;
@@ -208,7 +209,7 @@ export class ChatRoomsService {
                     }
                 },
                 {
-                    $project: { chatRoomObjId: { $toObjectId: '$chatRoomId' } },
+                    $project: { chatRoomObjId: { $toObjectId: '$chatRoomId' } , userInformations:"$userInformations" },
                 },
                 {
                     $lookup: {
@@ -230,8 +231,9 @@ export class ChatRoomsService {
         const tempRooms: SearchedRoomDescriptionResponse[] = [];
 
         chatParticipals.forEach((chatParticipal) => {
-
-            const room = new ChatRoomResponse(chatParticipal.chatRooms[0]);
+            const item = chatParticipal.chatRooms[0]
+            item.id = item._id
+            const room = new ChatRoomResponse(item);
             const description = `Gồm có ${chatParticipal.userInformations.length} thành viên`;
             tempRooms.push(new SearchedRoomDescriptionResponse(room.id, room.name, room.avatar, true, description));
         })

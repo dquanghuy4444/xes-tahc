@@ -37,3 +37,7 @@ export const UserApiPath = new (function(){
             return `${this.index}${paramsStr ? `?${paramsStr}` : ""}`
         })
 })()
+
+export const FileApiPath = new (function(){
+    (this.index = "files")
+})()

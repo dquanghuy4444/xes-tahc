@@ -8,11 +8,6 @@ import { CreateRoomReq, UpdateMemberReq, UpdateRoomReq } from './dto/chat-rooms.
 export class ChatRoomsController {
     constructor(private readonly chatRoomsService: ChatRoomsService) {}
 
-    @Post()
-    create(@IdFromToken() idFromToken: string, @Body() createChatReq: CreateRoomReq) {
-        return this.chatRoomsService.create(createChatReq, idFromToken);
-    }
-
     @Get(':id')
     getDetail(@IdFromToken() idFromToken: string, @Param('id') chatRoomId: string) {
         return this.chatRoomsService.getDetail(chatRoomId, idFromToken);
@@ -36,6 +31,11 @@ export class ChatRoomsController {
     @Get('private/:userId')
     getPrivateChatRoom(@Param('userId') userId: string) {
         return this.chatRoomsService.getPrivateChatRoom(userId);
+    }
+
+    @Post()
+    create(@IdFromToken() idFromToken: string, @Body() createChatReq: CreateRoomReq) {
+        return this.chatRoomsService.create(createChatReq, idFromToken);
     }
 
     @Put(':id/me/last-time-reading')

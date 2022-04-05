@@ -7,6 +7,7 @@ export class UserInfor {
     phoneNumber: string;
     email: string;
     isOnline: boolean;
+    lastTimeOnline: Date;
 
     constructor(user: User) {
         this.id = user.id;
@@ -15,6 +16,8 @@ export class UserInfor {
         this.phoneNumber = user.phoneNumber;
         this.email = user.email;
         this.isOnline = user.isOnline;
+        this.lastTimeOnline = user.lastTimeOnline;
+
     }
 }
 

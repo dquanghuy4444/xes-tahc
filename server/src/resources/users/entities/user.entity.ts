@@ -17,6 +17,8 @@ export class User extends Document {
     @Prop()
     isOnline: boolean;
     @Prop({ type: Date, default: Date.now })
+    lastTimeOnline: Date;
+    @Prop({ type: Date, default: Date.now })
     createdAt: Date;
 }
 
