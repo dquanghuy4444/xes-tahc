@@ -6,10 +6,10 @@ import { ChatParticipal, IUserInformation } from './entities/chat-participal.ent
 
 @Injectable()
 export class ChatParticipalsService {
-    constructor(@InjectModel(ChatParticipal.name) private chatParticipalModel: Model<ChatParticipal>) {}
+    constructor(@InjectModel(ChatParticipal.name) private chatParticipalModel: Model<ChatParticipal>) { }
 
     async create(createChatParticipalReq: CreateChatParticipalReq) {
-        const chatParticipals =  await this.chatParticipalModel.create(createChatParticipalReq);
+        const chatParticipals = await this.chatParticipalModel.create(createChatParticipalReq);
 
         return chatParticipals
     }
@@ -51,14 +51,14 @@ export class ChatParticipalsService {
         return true;
     }
 
-    async removeMember(chatRoomId: string, removedUserId: string, userId: string) {
+    async updateStatusMember(chatRoomId: string, removedUserId: string, userId: string, status: boolean = false) {
         const chatParticipal = await this.getDetailByChatRoomId(chatRoomId, userId);
 
         const newUserInformations = chatParticipal.userInformations.map((info) => {
             if (removedUserId === info.userId) {
                 return {
                     ...info,
-                    stillIn: false,
+                    stillIn: status,
                 };
             }
 

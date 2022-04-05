@@ -6,6 +6,7 @@ import { ChatRoom } from '../entities/chat-room.entity';
 export enum ENUM_UPDATE_MEMBER_TYPE {
     ADD = 'ADD',
     REMOVE = 'REMOVE',
+    CHANGE = 'CHANGE',
 }
 
 export class CreateRoomReq {

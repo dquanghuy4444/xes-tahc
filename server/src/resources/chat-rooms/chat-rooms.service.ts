@@ -191,7 +191,13 @@ export class ChatRoomsService {
         }
 
         if (type === ENUM_UPDATE_MEMBER_TYPE.REMOVE) {
-            const res = await this.chatParticipalsService.removeMember(chatRoomId, userIds[0], idFromToken);
+            const res = await this.chatParticipalsService.updateStatusMember(chatRoomId, userIds[0], idFromToken);
+
+            return res;
+        }
+
+        if (type === ENUM_UPDATE_MEMBER_TYPE.CHANGE) {
+            const res = await this.chatParticipalsService.updateStatusMember(chatRoomId, userIds[0], idFromToken , true);
 
             return res;
         }
