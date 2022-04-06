@@ -1,6 +1,6 @@
 import { ENUM_MESSAGE_TYPE } from "constants"
 
-import React, { useState } from "react"
+import React, { useState , useCallback, useMemo } from "react"
 
 import CloseIcon from "@mui/icons-material/Close"
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions"
@@ -20,7 +20,6 @@ import { v4 as uuidv4 } from "uuid"
 
 const Input = () => {
 
-
     const socket = useStore((state) => state.socket)
     const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const myInfor = useStore((state) => state.myInfor)
@@ -31,35 +30,47 @@ const Input = () => {
     const [isFocused, setIsFocused] = useState(true)
     const [isEmojiDisplayed, setIsEmojiDisplayed] = useState(false)
 
-    const sendFilesToServer = async(images, messId) => {
-        const formData = new FormData()
-        formData.append("chatRoomId", chatRoomInfor.id)
-        images.forEach((f) => {
-            formData.append("files", f.file)
-        })
+    const cbSendMess = useCallback(async(filesInfor, mess) => {
+        if (filesInfor){
+            const formData = new FormData()
+            formData.append("chatRoomId", chatRoomInfor.id)
+            filesInfor.files.forEach((f) => {
+                formData.append("files", f.file)
+            })
 
-        const mess = await postData(MessengerApiPath.sendFiles, formData, {
-            headers: {
-                "Content-Type": "multipart/form-data"
-            }
-        })
+            const res = await postData(MessengerApiPath.sendFiles, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data"
+                }
+            })
 
-        socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
-            ...mess,
-            messId,
-            userIds     : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
-            userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
-            senderInfor : myInfor,
-            chatRoom    : {
-                id      : chatRoomInfor.id,
-                name    : chatRoomInfor.name,
-                avatar  : chatRoomInfor.avatar,
-                isGroup : chatRoomInfor.isGroup
-            }
-        })
-    }
+            socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+                ...res,
+                messId  : filesInfor.messId,
+                userIds : chatRoomInfor.userInfors
+                    .filter((info) => info.stillIn)
+                    .map((info) => info.id),
+                userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
+                senderInfor : myInfor,
+                chatRoom    : {
+                    id      : chatRoomInfor.id,
+                    name    : chatRoomInfor.name,
+                    avatar  : chatRoomInfor.avatar,
+                    isGroup : chatRoomInfor.isGroup
+                }
+            })
+        }
+        if (mess){
+            postData(MessengerApiPath.index, {
+                content    : mess,
+                type       : ENUM_MESSAGE_TYPE.TEXT,
+                chatRoomId : chatRoomInfor.id
+            })
+        }
+    } , [])
 
-    const handleSendMessage = async() => {
+    const handleSendMessage = useCallback(async() => {
+        let filesInfor = null
         if (files.length > 0){
             const messId = uuidv4()
 
@@ -67,7 +78,7 @@ const Input = () => {
                 {
                     content     : "",
                     type        : ENUM_MESSAGE_TYPE.IMAGE,
-                    chatRoomId  : id,
+                    chatRoomId  : chatRoomInfor.id,
                     id          : messId,
                     messId,
                     attachments : files.map((file) => ({
@@ -89,40 +100,38 @@ const Input = () => {
                 }
             ])
 
-            sendFilesToServer(files, messId)
-
+            filesInfor = {
+                files,
+                messId
+            }
             setFiles([])
         }
 
-        if (!message){
-            return
+        if (message){
+            socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
+                content    : message,
+                type       : ENUM_MESSAGE_TYPE.TEXT,
+                chatRoomId : chatRoomInfor.id,
+                id         : uuidv4(),
+                createdBy  : myInfor.id,
+                userIds    : chatRoomInfor.userInfors
+                    .filter((info) => info.stillIn)
+                    .map((info) => info.id),
+                userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
+                senderInfor : myInfor,
+                chatRoom    : {
+                    id      : chatRoomInfor.id,
+                    name    : chatRoomInfor.name,
+                    avatar  : chatRoomInfor.avatar,
+                    isGroup : chatRoomInfor.isGroup
+                }
+            })
+
+            setMessage("")
         }
 
-        socket.emit(SOCKET_EVENT_NAMES.CLIENT.SEND_MESSENGER, {
-            content     : message,
-            type        : ENUM_MESSAGE_TYPE.TEXT,
-            chatRoomId  : chatRoomInfor.id,
-            id          : uuidv4(),
-            createdBy   : myInfor.id,
-            userIds     : chatRoomInfor.userInfors.filter((info) => info.stillIn).map((info) => info.id),
-            userInfors  : chatRoomInfor.isGroup ? [] : chatRoomInfor.userInfors,
-            senderInfor : myInfor,
-            chatRoom    : {
-                id      : chatRoomInfor.id,
-                name    : chatRoomInfor.name,
-                avatar  : chatRoomInfor.avatar,
-                isGroup : chatRoomInfor.isGroup
-            }
-        })
-
-        setMessage("")
-
-        postData(MessengerApiPath.index, {
-            content    : message,
-            type       : ENUM_MESSAGE_TYPE.TEXT,
-            chatRoomId : chatRoomInfor.id
-        })
-    }
+        cbSendMess(filesInfor, message)
+    } , [files , message])
 
     useEventListener("keypress", (e) => {
         if (e.keyCode === 13 && isFocused){
@@ -140,7 +149,7 @@ const Input = () => {
         setMessage((prev) => prev + emojiObject.emoji)
     }
 
-    const cbSelecteFiles = async(fileList) => {
+    const cbSelecteFiles = useCallback(async(fileList) => {
         if (fileList.length === 0){
             return
         }
@@ -152,7 +161,7 @@ const Input = () => {
                 file
             }))
         ])
-    }
+    } ,[])
 
     const fileSelector = buildFileSelector(cbSelecteFiles)
 
@@ -161,7 +170,7 @@ const Input = () => {
         fileSelector.click()
     }
 
-    const showImageFilesWrapper = () => {
+    const showImageFilesWrapper = useMemo(() => {
         if (files.length === 0){
             return <></>
         }
@@ -201,11 +210,11 @@ const Input = () => {
                 </div>
             </div>
         )
-    }
+    } , [files])
 
     return (
         <div className="relative">
-            { showImageFilesWrapper() }
+            { showImageFilesWrapper }
 
             <div className="min-h-[60px] flex items-center space-x-3 p-4">
                 <InsertPhotoIcon

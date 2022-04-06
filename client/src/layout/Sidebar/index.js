@@ -19,7 +19,6 @@ import ModalCreateRoom from "./ModalCreateRoom"
 import SearchChatRoomInput from "./SearchChatRoomInput"
 import SkeletonChatRoomCard from "./SkeletonChatRoomCard"
 
-
 const Sidebar = ({ className }) => {
     const { id } = useParams()
 
@@ -33,7 +32,7 @@ const Sidebar = ({ className }) => {
     const chatRoomDescriptions = useStore((state) => state.chatRoomDescriptions)
     const setChatRoomDescriptions = useStore((state) => state.setChatRoomDescriptions)
 
-    useFetchDataNoSave(
+    const [isLoading] = useFetchDataNoSave(
         ChatRoomApiPath.myChatRoom,
         (res) => {
             if (!res){
@@ -92,7 +91,7 @@ const Sidebar = ({ className }) => {
                     ...data,
                     lastMessengerInfor: {
                         ...data.lastMessengerInfor,
-                        hasRead: chatRoomInfor.id === data.id
+                        hasRead: chatRoomInfor?.id === data.id
                     }
                 }
             ])
@@ -160,7 +159,7 @@ const Sidebar = ({ className }) => {
     })
 
     const showChatRoomDescriptions = useMemo(() => {
-        if (chatRoomDescriptions?.length === 0){
+        if (isLoading){
             return (
                 <>
                     <SkeletonChatRoomCard />
@@ -184,6 +183,10 @@ const Sidebar = ({ className }) => {
                     <SkeletonChatRoomCard />
                 </>
             )
+        }
+
+        if (chatRoomDescriptions?.length === 0){
+            return <p className="text-center text-lg mt-4">Bạn chưa có cuộc hội thoại nào</p>
         }
 
         const handleRedirectToChatRoom = (chatRoomId) => {
@@ -210,13 +213,10 @@ const Sidebar = ({ className }) => {
                 info={ item }
                 isActive={ item.id === id }
                 key={ item.id }
-                roomIsGroup={ item.isGroup }
-                roomIsOnline={ item.isOnline }
-                userInfors={ chatRoomInfor?.userInfors || [] }
                 onClick={ () => handleRedirectToChatRoom(item.id) }
             />
         ))
-    }, [chatRoomDescriptions, id])
+    }, [chatRoomDescriptions, id , isLoading])
 
     return (
         <>

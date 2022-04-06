@@ -9,7 +9,7 @@ import MessengerCard from "./MessengerCard"
 const Content = () => {
     const endMessengerRef = useRef(null)
 
-    const roomInfor = useStore((state) => state.chatRoomInfor)
+    const chatRoomInfor = useStore((state) => state.chatRoomInfor)
     const messengers = useStore((state) => state.messengers)
 
     const scrollToBottom = () => {
@@ -23,7 +23,7 @@ const Content = () => {
     }, [messengers])
 
     const messengersWithUserInfor = useMemo(() => {
-        const userInfors = roomInfor?.userInfors || []
+        const userInfors = chatRoomInfor?.userInfors || []
 
         return messengers.map((mess) => ({
             ...mess,
@@ -33,7 +33,7 @@ const Content = () => {
                 userInfor: userInfors.find((info) => info.id === mess?.info?.victim)
             }
         }))
-    }, [roomInfor, messengers])
+    }, [chatRoomInfor, messengers])
 
 
     return (
@@ -50,7 +50,16 @@ const Content = () => {
                 </div>
             </div>
 
-            <Input />
+            {
+                chatRoomInfor?.blockedIds.length > 0 ? (
+                    <div className="min-h-[60px] text-center flex-col flex-center bg-quinary--light">
+                        <p className="text-lg font-semibold">Hiện tại , bạn không thể gửi tin nhắn cho người dùng này được</p>
+                    </div>
+                ) : (
+                    <Input />
+
+                )
+            }
         </div>
     )
 }

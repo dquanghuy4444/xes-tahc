@@ -9,7 +9,7 @@ import AvatarWithOnline from "components/AvatarWithOnline"
 import { MY_NAME } from "configs"
 import { getTimePeriodToPresent } from "utils/get-time-period-to-present"
 
-const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup, roomIsOnline, onClick }) => {
+const ChatRoomCard = ({ info, isActive, onClick }) => {
     const { lastMessengerInfor, avatar, name } = info
 
     const showTimePeriodToPresent = () => {
@@ -29,14 +29,14 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup, roomIsOnline, o
         }
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.TEXT){
             return `${
-                lastMessengerInfor.userName === MY_NAME || roomIsGroup
+                lastMessengerInfor.userName === MY_NAME || info.isGroup
                     ? `${lastMessengerInfor.userName} : `
                     : ""
             }${lastMessengerInfor.content}`
         }
         if (lastMessengerInfor.type === ENUM_MESSAGE_TYPE.IMAGE){
             return `${
-                lastMessengerInfor.userName === MY_NAME || roomIsGroup
+                lastMessengerInfor.userName === MY_NAME || info.isGroup
                     ? `${lastMessengerInfor.userName} : `
                     : ""
             }đã tải hình ảnh`
@@ -52,14 +52,13 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup, roomIsOnline, o
                 return `${lastMessengerInfor.userName} đã thêm thành viên`
             }
             if (lastMessengerInfor.info.type === ENUM_MESSAGE_INFO_TYPE.LEAVE_CHAT){
-                const victimInfor = userInfors.find((u) => u.id === lastMessengerInfor.info.victim)
 
                 if (lastMessengerInfor.createdBy === lastMessengerInfor.info.victim){
-                    return `${victimInfor?.fullName} đã tự ra khỏi nhóm`
+                    return `${lastMessengerInfor?.info.victimName} đã tự ra khỏi nhóm`
                 }
 
                 return `${lastMessengerInfor.userName} đã kick ${
-                    victimInfor?.fullName || "thành viên"
+                    lastMessengerInfor?.info.victimName || "thành viên"
                 } ra khỏi nhóm`
             }
         }
@@ -75,7 +74,7 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup, roomIsOnline, o
             onClick={ onClick }
         >
             <div className="relative">
-                { roomIsGroup ? (
+                { info.isGroup ? (
                     <>
                         <Avatar alt="Remy Sharp" src={ avatar } sx={ { width: 52, height: 52 } } />
 
@@ -90,7 +89,7 @@ const ChatRoomCard = ({ info, isActive, userInfors, roomIsGroup, roomIsOnline, o
                     </>
                 ) : (
                     <AvatarWithOnline
-                        isOnline={ roomIsOnline }
+                        isOnline={ info.isOnline }
                         src={ avatar }
                         sx={ { width: 52, height: 52 } }
                     />
