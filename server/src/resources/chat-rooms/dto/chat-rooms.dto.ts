@@ -87,12 +87,14 @@ export class ChatRoomDescriptionResponse extends ChatRoomResponse {
 export class ChatRoomDetailResponse extends ChatRoomDescriptionResponse {
     userInfors: UserInfor[];
     isOnline: boolean;
+    blockedIds: string[];
     lastTimeOnline: Date;
 
     constructor(chatRoom: ChatRoom, userInfors: UserInfor[]) {
         super(chatRoom);
         this.userInfors = userInfors;
         this.isOnline = false;
+        this.blockedIds = [];
         this.lastTimeOnline = null;
     }
 }

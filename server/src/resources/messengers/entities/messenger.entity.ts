@@ -19,6 +19,7 @@ export enum ENUM_MESSAGE_INFO_TYPE {
 export class MessageInfo {
     type: ENUM_MESSAGE_INFO_TYPE;
     victim?: string;
+    victimName?: string;
 }
 
 export class MessageAttachment {

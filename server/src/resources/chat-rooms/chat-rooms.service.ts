@@ -12,7 +12,7 @@ import {
 } from './dto/chat-rooms.dto';
 import { Model } from 'mongoose';
 import { ChatRoom } from './entities/chat-room.entity';
-import { Messenger } from 'resources/messengers/entities/messenger.entity';
+import { ENUM_MESSAGE_TYPE, Messenger } from 'resources/messengers/entities/messenger.entity';
 import { ChatParticipalsService } from 'resources/chat-participals/chat-participals.service';
 import { ChatParticipal, IUserInformation } from 'resources/chat-participals/entities/chat-participal.entity';
 import { UsersService } from 'resources/users/users.service';
@@ -62,6 +62,7 @@ export class ChatRoomsService {
         const chatParticipal = await this.chatParticipalsService.getDetailByChatRoomId(chatRoomId, idFromToken);
 
         const userInfors = [];
+        let blockedIds = []
         await Promise.all(
             chatParticipal.userInformations.map(async (infor) => {
                 if (infor.userId !== idFromToken) {
@@ -70,6 +71,10 @@ export class ChatRoomsService {
                         ...infor,
                         ...userInfor,
                     });
+                }
+
+                if (!infor.stillIn) {
+                    blockedIds.push(infor.userId)
                 }
             }),
         );
@@ -82,6 +87,7 @@ export class ChatRoomsService {
             result.avatar = userInfors[0].avatar;
             result.isOnline = userInfors[0].isOnline;
             result.lastTimeOnline = userInfors[0].lastTimeOnline;
+            result.blockedIds = blockedIds;
         }
 
         return result;
@@ -93,7 +99,7 @@ export class ChatRoomsService {
         const chatParticipals = await this.chatParticipalModel.aggregate([
             {
                 $match: {
-                    userInformations: { $elemMatch: { userId: idFromToken, stillIn: true } }
+                    userInformations: { $elemMatch: { userId: idFromToken } }
                 },
             },
             {
@@ -107,7 +113,33 @@ export class ChatRoomsService {
                     as: 'chatRooms',
                 },
             },
+            {
+                $match: {
+                    $or: [
+                        {
+                            $and: [
+                                {
+                                    userInformations: { $elemMatch: { userId: idFromToken, stillIn: true } },
+
+                                },
+                                {
+                                    chatRooms: {
+                                        $elemMatch: { isGroup: true },
+                                    },
+                                }
+                            ]
+                        },
+                        {
+                            chatRooms: {
+                                $elemMatch: { isGroup: false },
+                            },
+                        },
+                    ]
+                },
+            },
         ])
+
+        console.log(chatParticipals)
 
         await Promise.all(chatParticipals.map(async (chatParticipal: any) => {
             const room = new ChatRoomDescriptionResponse(chatParticipal.chatRooms[0])
@@ -133,6 +165,7 @@ export class ChatRoomsService {
 
             if (lastMessenger) {
                 let userName = MY_NAME;
+                let victimName = "";
 
                 const { createdBy, createdAt, content } = lastMessenger;
 
@@ -142,12 +175,21 @@ export class ChatRoomsService {
                     userName = userInfor.fullName;
                 }
 
+                if (lastMessenger.type === ENUM_MESSAGE_TYPE.INFO && lastMessenger.info?.victim) {
+                    const userInfor = await this.usersService.getDetail(lastMessenger.info?.victim);
+
+                    victimName = userInfor.fullName;
+                }
+
                 room.lastMessengerInfor = {
                     createdBy: createdBy,
                     createdAt: createdAt,
                     content: content,
                     type: lastMessenger.type,
-                    info: lastMessenger.info,
+                    info: {
+                        ...lastMessenger.info,
+                        victimName
+                    },
                     userName,
                     hasRead: new Date(lastTimeReading).getTime() > new Date(createdAt).getTime(),
                 };
@@ -197,7 +239,7 @@ export class ChatRoomsService {
         }
 
         if (type === ENUM_UPDATE_MEMBER_TYPE.CHANGE) {
-            const res = await this.chatParticipalsService.updateStatusMember(chatRoomId, userIds[0], idFromToken , true);
+            const res = await this.chatParticipalsService.updateStatusMember(chatRoomId, userIds[0], idFromToken, true);
 
             return res;
         }
@@ -215,7 +257,7 @@ export class ChatRoomsService {
                     }
                 },
                 {
-                    $project: { chatRoomObjId: { $toObjectId: '$chatRoomId' } , userInformations:"$userInformations" },
+                    $project: { chatRoomObjId: { $toObjectId: '$chatRoomId' }, userInformations: "$userInformations" },
                 },
                 {
                     $lookup: {
